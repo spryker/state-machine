@@ -236,7 +236,7 @@ class Builder implements BuilderInterface
             throw new StateMachineException(
                 sprintf(
                     'State machine XML file not found in "%s".',
-                    str_replace(APPLICATION_ROOT_DIR, '', $this->stateMachineConfig->getPathToStateMachineXmlFiles())
+                    str_replace(APPLICATION_ROOT_DIR, '', $this->stateMachineConfig->getPathToStateMachineXmlFiles()),
                 )
             );
         }
