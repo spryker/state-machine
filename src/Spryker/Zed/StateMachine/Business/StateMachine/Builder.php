@@ -269,8 +269,10 @@ class Builder implements BuilderInterface
     protected function loadXmlFromFileName($pathToXml, $fileName)
     {
         $pathToXml = $pathToXml . DIRECTORY_SEPARATOR . $fileName . '.xml';
+        $realPathToXml = realpath($pathToXml);
+        $realPathToStateMachineXmlFiles = realpath($this->stateMachineConfig->getPathToStateMachineXmlFiles());
 
-        if (!$this->isValidPath($pathToXml)) {
+        if (!$realPathToXml || strpos($realPathToXml, $realPathToStateMachineXmlFiles . '/') !== 0) {
             throw new StateMachineException(
                 sprintf(
                     'State machine XML file not found in "%s".',
@@ -290,19 +292,6 @@ class Builder implements BuilderInterface
         }
 
         return $this->loadXml($xmlContents);
-    }
-
-    /**
-     * @param string $pathToXml
-     *
-     * @return bool
-     */
-    protected function isValidPath(string $pathToXml): bool
-    {
-        $realPathToXml = realpath($pathToXml);
-        $realPathToStateMachineXmlFiles = realpath($this->stateMachineConfig->getPathToStateMachineXmlFiles());
-
-        return $realPathToXml && strpos($realPathToXml, $realPathToStateMachineXmlFiles . '/') === 0;
     }
 
     /**
