@@ -93,7 +93,7 @@ class StateMachineFacadeExceptionTest extends Unit
 
         // Assert
         $this->expectException(StateMachineException::class);
-        $this->expectExceptionMessage('State machine XML file not found in "vendor/spryker/spryker/Bundles/StateMachine/tests/SprykerTest/Zed/StateMachine/Business/../_support/Fixtures".');
+        $this->expectExceptionMessage('State machine XML file not found in "src/Spryker/StateMachine/tests/SprykerTest/Zed/StateMachine/Business/../_support/Fixtures".');
 
         // Act
         $this->getStateMachineFacadeWithConfigMock()->drawProcess($stateMachineProcessTransfer);
@@ -111,7 +111,7 @@ class StateMachineFacadeExceptionTest extends Unit
 
         // Assert
         $this->expectException(StateMachineException::class);
-        $this->expectExceptionMessage('State machine XML file not found in "vendor/spryker/spryker/Bundles/StateMachine/tests/SprykerTest/Zed/StateMachine/Business/../_support/Fixtures".');
+        $this->expectExceptionMessage('State machine XML file not found in "src/Spryker/StateMachine/tests/SprykerTest/Zed/StateMachine/Business/../_support/Fixtures".');
 
         // Act
         $this->getStateMachineFacadeWithConfigMock()->drawProcess($stateMachineProcessTransfer);
