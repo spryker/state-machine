@@ -8,3 +8,9 @@ parameters:
         - '#Call to an undefined method Orm\\.+Query::useStateHistoryQuery\(\).#'
         -
             identifier: missingType.iterableValue
+        -
+            identifier: offsetAccess.nonOffsetAccessible
+        -
+            identifier: offsetAssign.dimType
+        -
+            identifier: assign.propertyType
