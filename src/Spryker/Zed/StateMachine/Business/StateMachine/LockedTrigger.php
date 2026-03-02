@@ -22,10 +22,6 @@ class LockedTrigger implements TriggerInterface
      */
     protected $stateMachineTrigger;
 
-    /**
-     * @param \Spryker\Zed\StateMachine\Business\StateMachine\TriggerInterface $stateMachineTrigger
-     * @param \Spryker\Zed\StateMachine\Business\Lock\ItemLockInterface $itemLock
-     */
     public function __construct(TriggerInterface $stateMachineTrigger, ItemLockInterface $itemLock)
     {
         $this->itemLock = $itemLock;

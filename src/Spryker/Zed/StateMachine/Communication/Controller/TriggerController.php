@@ -222,12 +222,6 @@ class TriggerController extends AbstractController
         return $form->isSubmitted() && $form->isValid();
     }
 
-    /**
-     * @param string $processName
-     * @param string $stateMachineName
-     *
-     * @return \Generated\Shared\Transfer\StateMachineProcessTransfer
-     */
     protected function createStateMachineProcessTransfer(
         string $processName,
         string $stateMachineName
@@ -237,12 +231,6 @@ class TriggerController extends AbstractController
             ->setStateMachineName($stateMachineName);
     }
 
-    /**
-     * @param int $identifier
-     * @param int $idState
-     *
-     * @return \Generated\Shared\Transfer\StateMachineItemTransfer
-     */
     protected function createStateMachineItemTransfer(int $identifier, int $idState): StateMachineItemTransfer
     {
         return (new StateMachineItemTransfer())

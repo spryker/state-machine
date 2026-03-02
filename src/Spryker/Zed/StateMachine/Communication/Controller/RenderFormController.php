@@ -63,11 +63,6 @@ class RenderFormController extends AbstractController
      */
     public const DEFAULT_REDIRECT_URL = '/state-machine/list';
 
-    /**
-     * @param \Symfony\Component\HttpFoundation\Request $request
-     *
-     * @return array
-     */
     public function eventAction(Request $request): array
     {
         $identifier = $this->castId($request->attributes->getInt(static::URL_PARAM_IDENTIFIER));
@@ -89,11 +84,6 @@ class RenderFormController extends AbstractController
         ]);
     }
 
-    /**
-     * @param \Symfony\Component\HttpFoundation\Request $request
-     *
-     * @return array
-     */
     public function eventItemAction(Request $request): array
     {
         $identifier = $this->castId($request->attributes->getInt(static::URL_PARAM_IDENTIFIER));

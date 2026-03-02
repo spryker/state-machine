@@ -36,9 +36,6 @@ class StateUpdaterTest extends StateMachineMocks
      */
     public const TEST_STATE_MACHINE_NAME = 'test state machine name';
 
-    /**
-     * @return void
-     */
     public function testStateUpdaterShouldUpdateStateInTransaction(): void
     {
         $stateUpdater = $this->createStateUpdater();
@@ -50,9 +47,6 @@ class StateUpdaterTest extends StateMachineMocks
         );
     }
 
-    /**
-     * @return void
-     */
     public function testStateUpdaterShouldTriggerHandlerWhenStateChanged(): void
     {
         $stateMachineHandlerResolverMock = $this->createHandlerResolverMock();
@@ -76,9 +70,6 @@ class StateUpdaterTest extends StateMachineMocks
         );
     }
 
-    /**
-     * @return void
-     */
     public function testStateUpdaterShouldUpdateTimeoutsWhenStateChanged(): void
     {
         $timeoutMock = $this->createTimeoutMock();
@@ -97,9 +88,6 @@ class StateUpdaterTest extends StateMachineMocks
         );
     }
 
-    /**
-     * @return void
-     */
     public function testStateMachineUpdaterShouldPersistStateHistory(): void
     {
         $persistenceMock = $this->createPersistenceMock();
@@ -171,14 +159,6 @@ class StateUpdaterTest extends StateMachineMocks
         return $sourceStates;
     }
 
-    /**
-     * @param \Spryker\Zed\StateMachine\Business\StateMachine\TimeoutInterface|null $timeoutMock
-     * @param \Spryker\Zed\StateMachine\Business\StateMachine\HandlerResolverInterface|null $handlerResolverMock
-     * @param \Spryker\Zed\StateMachine\Business\StateMachine\PersistenceInterface|null $stateMachinePersistenceMock
-     * @param \Propel\Runtime\Connection\ConnectionInterface|null $propelConnectionMock
-     *
-     * @return \Spryker\Zed\StateMachine\Business\StateMachine\StateUpdater
-     */
     protected function createStateUpdater(
         ?TimeoutInterface $timeoutMock = null,
         ?HandlerResolverInterface $handlerResolverMock = null,

@@ -30,9 +30,6 @@ class HandlerResolverTest extends StateMachineMocks
      */
     public const TEST_HANDLER_NAME = 'testing state machine name';
 
-    /**
-     * @return void
-     */
     public function testHandlerResolverShouldReturnInstanceOfHandlerWhenCorrectNameGiven(): void
     {
         $handlerResolver = $this->createHandlerResolver()->get(static::TEST_HANDLER_NAME);
@@ -40,9 +37,6 @@ class HandlerResolverTest extends StateMachineMocks
         $this->assertInstanceOf(StateMachineHandlerInterface::class, $handlerResolver);
     }
 
-    /**
-     * @return void
-     */
     public function testHandlerResolverWhenRequestedNonExistentShouldThrowException(): void
     {
         $this->expectException(StateMachineHandlerNotFound::class);
@@ -50,9 +44,6 @@ class HandlerResolverTest extends StateMachineMocks
         $this->createHandlerResolver()->get('no existing state machine');
     }
 
-    /**
-     * @return \Spryker\Zed\StateMachine\Business\StateMachine\HandlerResolver
-     */
     protected function createHandlerResolver(): HandlerResolver
     {
         $stateMachineHandlerMock = $this->createStateMachineHandlerMock();

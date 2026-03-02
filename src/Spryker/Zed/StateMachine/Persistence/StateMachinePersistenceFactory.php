@@ -71,9 +71,6 @@ class StateMachinePersistenceFactory extends AbstractPersistenceFactory
         return SpyStateMachineLockQuery::create();
     }
 
-    /**
-     * @return \Spryker\Zed\StateMachine\Persistence\Propel\Mapper\StateMachineMapper
-     */
     public function createStateMachineMapper(): StateMachineMapper
     {
         return new StateMachineMapper();

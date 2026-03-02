@@ -169,11 +169,6 @@ class GraphController extends AbstractController
         ]);
     }
 
-    /**
-     * @param \Symfony\Component\HttpFoundation\Request $request
-     *
-     * @return string
-     */
     protected function getSanitizedHighlightState(Request $request): string
     {
         $highlightState = (string)$request->query->get(static::URL_PARAM_HIGHLIGHT_STATE);

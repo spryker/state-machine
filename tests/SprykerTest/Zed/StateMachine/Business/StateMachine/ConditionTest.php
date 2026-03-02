@@ -27,9 +27,6 @@ use SprykerTest\Zed\StateMachine\Mocks\StateMachineMocks;
  */
 class ConditionTest extends StateMachineMocks
 {
-    /**
-     * @return void
-     */
     public function testCheckConditionForTransitionShouldReturnTargetStateOfGivenTransition(): void
     {
         $stateMachineHandlerResolverMock = $this->createStateMachineResolverMock(true);
@@ -65,9 +62,6 @@ class ConditionTest extends StateMachineMocks
         $this->assertSame($targetState->getName(), $processedTargetState->getName());
     }
 
-    /**
-     * @return void
-     */
     public function testCheckConditionForTransitionWhenConditionReturnsFalseShouldReturnSourceState(): void
     {
         $stateMachineHandlerResolverMock = $this->createStateMachineResolverMock(false);

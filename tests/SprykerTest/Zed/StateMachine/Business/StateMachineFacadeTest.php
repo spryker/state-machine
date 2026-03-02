@@ -74,9 +74,6 @@ class StateMachineFacadeTest extends Unit
      */
     protected $tester;
 
-    /**
-     * @return void
-     */
     public function testTriggerForNewStateMachineItemWhenInitialProcessIsSuccessShouldNotifyHandlerStateChange(): void
     {
         $processName = static::TEST_PROCESS_NAME;
@@ -111,9 +108,6 @@ class StateMachineFacadeTest extends Unit
         $this->assertSame($processName, $stateMachineItemTransfer->getProcessName());
     }
 
-    /**
-     * @return void
-     */
     public function testTriggerEventForItemWithManualEventShouldMoveToNextStateWithManualEvent(): void
     {
         $processName = static::TEST_PROCESS_NAME;
@@ -140,9 +134,6 @@ class StateMachineFacadeTest extends Unit
         $this->assertSame($identifier, $stateMachineItemTransfer->getIdentifier());
     }
 
-    /**
-     * @return void
-     */
     public function testGetProcessesShouldReturnListOfProcessesAddedToHandler(): void
     {
         $processName = static::TEST_PROCESS_NAME;
@@ -165,9 +156,6 @@ class StateMachineFacadeTest extends Unit
         $this->assertSame(static::TEST_PROCESS_WITHOUT_EVENTS_NAME, $process->getProcessName());
     }
 
-    /**
-     * @return void
-     */
     public function testGetStateMachineProcessIdShouldReturnIdStoredInPersistence(): void
     {
         $processName = static::TEST_PROCESS_NAME;
@@ -189,9 +177,6 @@ class StateMachineFacadeTest extends Unit
         $this->assertSame($stateMachineProcessEntity->getIdStateMachineProcess(), $processId);
     }
 
-    /**
-     * @return void
-     */
     public function testGetManualEventsForStateMachineItemShouldReturnAllManualEventsForProvidedState(): void
     {
         $processName = static::TEST_PROCESS_NAME;
@@ -220,9 +205,6 @@ class StateMachineFacadeTest extends Unit
         $this->assertSame('ship order', $manualEvent);
     }
 
-    /**
-     * @return void
-     */
     public function testGetManualEventForStateMachineItemsShouldReturnAllEventsForProvidedStates(): void
     {
         $processName = static::TEST_PROCESS_NAME;
@@ -266,9 +248,6 @@ class StateMachineFacadeTest extends Unit
         $this->assertSame('payment received', $manualEvent);
     }
 
-    /**
-     * @return void
-     */
     public function testGetProcessedStateMachineItemsShouldReturnItemsByProvidedStateIdsStoredInPersistence(): void
     {
         $processName = static::TEST_PROCESS_NAME;
@@ -347,9 +326,6 @@ class StateMachineFacadeTest extends Unit
         );
     }
 
-    /**
-     * @return void
-     */
     public function testGetProcessedStateMachineItemTransferShouldReturnItemTransfer(): void
     {
         $processName = static::TEST_PROCESS_NAME;
@@ -393,9 +369,6 @@ class StateMachineFacadeTest extends Unit
         );
     }
 
-    /**
-     * @return void
-     */
     public function testGetStateHistoryByStateItemIdentifierShouldReturnAllHistoryForThatItem(): void
     {
         $processName = static::TEST_PROCESS_NAME;
@@ -429,9 +402,6 @@ class StateMachineFacadeTest extends Unit
         $this->assertSame('order exported', $stateMachineItemTransfer->getStateName());
     }
 
-    /**
-     * @return void
-     */
     public function testGetItemsWithFlagShouldReturnListOfStateMachineItemsWithGivenFlag(): void
     {
         $processName = static::TEST_PROCESS_NAME;
@@ -472,9 +442,6 @@ class StateMachineFacadeTest extends Unit
         $this->assertCount(1, $stateMachineItemsWithGivenFlag);
     }
 
-    /**
-     * @return void
-     */
     public function testGetItemsWithFlagShouldReturnSortedListOfStateMachineItemsWithGivenFlag(): void
     {
         $processName = static::TEST_PROCESS_NAME;
@@ -512,9 +479,6 @@ class StateMachineFacadeTest extends Unit
         }
     }
 
-    /**
-     * @return void
-     */
     public function testGetItemsWithoutFlagShouldReturnListOfStateMachineItemsWithoutGivenFlag(): void
     {
         $processName = static::TEST_PROCESS_NAME;
@@ -558,9 +522,6 @@ class StateMachineFacadeTest extends Unit
         $this->assertCount(2, $stateMachineItemsWithoutGivenFlag);
     }
 
-    /**
-     * @return void
-     */
     public function testCheckConditionsShouldProcessStatesWithConditionAndWithoutEvent(): void
     {
         $processName = static::TEST_PROCESS_NAME;
@@ -588,9 +549,6 @@ class StateMachineFacadeTest extends Unit
         $this->assertSame('waiting for payment', $stateMachineItemTransfer->getStateName());
     }
 
-    /**
-     * @return void
-     */
     public function testCheckTimeoutsShouldMoveStatesWithExpiredTimeouts(): void
     {
         $processName = static::TEST_PROCESS_NAME;
@@ -627,9 +585,6 @@ class StateMachineFacadeTest extends Unit
         $this->assertSame('reminder I sent', $stateMachineItemTransfer->getStateName());
     }
 
-    /**
-     * @return void
-     */
     public function testClearLocksShouldEmptyDatabaseFromExpiredLocks(): void
     {
         $identifier = '1985-07-01';
@@ -648,9 +603,6 @@ class StateMachineFacadeTest extends Unit
         $this->assertSame(0, $numberOfItems);
     }
 
-    /**
-     * @return void
-     */
     public function testLoopDoesNotCauseExceptions(): void
     {
         $processName = static::TEST_PROCESS_WITH_LOOP_NAME;
@@ -678,9 +630,6 @@ class StateMachineFacadeTest extends Unit
         $this->assertSame($identifier, $stateMachineItemTransfer->getIdentifier());
     }
 
-    /**
-     * @return void
-     */
     public function testStateMachineExistsReturnsTrueWhenStateMachineHasHandler(): void
     {
         // Assign
@@ -696,9 +645,6 @@ class StateMachineFacadeTest extends Unit
         $this->assertEquals($expectedResult, $actualResult);
     }
 
-    /**
-     * @return void
-     */
     public function testStateMachineExistsReturnsFalseWhenStateMachineHasNoHandler(): void
     {
         // Assign
@@ -714,9 +660,6 @@ class StateMachineFacadeTest extends Unit
         $this->assertEquals($expectedResult, $actualResult);
     }
 
-    /**
-     * @return void
-     */
     public function testFindStateMachineProcessReturnsCorrectData(): void
     {
         // Arrange
@@ -735,9 +678,6 @@ class StateMachineFacadeTest extends Unit
         $this->assertSame($stateMachineProcessTransfer->getProcessName(), $stateMachineProcessEntity->getName());
     }
 
-    /**
-     * @return void
-     */
     public function testFindStateMachineProcessReturnsNullWithIncorrectFilter(): void
     {
         // Arrange
@@ -753,9 +693,6 @@ class StateMachineFacadeTest extends Unit
         $this->assertNull($stateMachineProcessTransfer);
     }
 
-    /**
-     * @return void
-     */
     public function testGetProcessStateNamesReturnsArrayOfStateNames(): void
     {
         // Arrange
@@ -782,9 +719,6 @@ class StateMachineFacadeTest extends Unit
         $this->assertSame('Foo 1 - sub process state 2', array_pop($stateNames));
     }
 
-    /**
-     * @return void
-     */
     public function testCheckConditionsShouldProcessStatesWithoutConditionAndWithoutEvent(): void
     {
         $processName = static::TEST_PROCESS_WITHOUT_EVENTS_NAME;
@@ -819,9 +753,6 @@ class StateMachineFacadeTest extends Unit
         $this->assertSame('ready', $stateMachineItemTransfer->getStateName());
     }
 
-    /**
-     * @return void
-     */
     public function testDrawProcessReturnsRenderedGraph(): void
     {
         // Arrange
@@ -869,11 +800,6 @@ class StateMachineFacadeTest extends Unit
         return $stateMachineFacade;
     }
 
-    /**
-     * @param int $seconds
-     *
-     * @return void
-     */
     protected function sleepIfMySql(int $seconds): void
     {
         if (Config::get(PropelConstants::ZED_DB_ENGINE) === PropelConfig::DB_ENGINE_MYSQL) {

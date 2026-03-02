@@ -108,13 +108,6 @@ class Builder implements BuilderInterface
      */
     protected $stateMachineConfig;
 
-    /**
-     * @param \Spryker\Zed\StateMachine\Business\Process\EventInterface $event
-     * @param \Spryker\Zed\StateMachine\Business\Process\StateInterface $state
-     * @param \Spryker\Zed\StateMachine\Business\Process\TransitionInterface $transition
-     * @param \Spryker\Zed\StateMachine\Business\Process\ProcessInterface $process
-     * @param \Spryker\Zed\StateMachine\StateMachineConfig $stateMachineConfig
-     */
     public function __construct(
         EventInterface $event,
         StateInterface $state,
@@ -292,11 +285,6 @@ class Builder implements BuilderInterface
         return $this->loadXml($xmlContents);
     }
 
-    /**
-     * @param string $pathToXml
-     *
-     * @return bool
-     */
     protected function isValidPath(string $pathToXml): bool
     {
         $realPathToXml = realpath($pathToXml);

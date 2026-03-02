@@ -130,10 +130,6 @@ class Drawer implements DrawerInterface
      */
     protected $stateMachineHandler;
 
-    /**
-     * @param \Spryker\Shared\Graph\GraphInterface $graph
-     * @param \Spryker\Zed\StateMachine\Dependency\Plugin\StateMachineHandlerInterface $stateMachineHandler
-     */
     public function __construct(GraphInterface $graph, StateMachineHandlerInterface $stateMachineHandler)
     {
         $this->graph = $graph;

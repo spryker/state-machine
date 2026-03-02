@@ -32,11 +32,6 @@ class Finder implements FinderInterface
      */
     protected $queryContainer;
 
-    /**
-     * @param \Spryker\Zed\StateMachine\Business\StateMachine\BuilderInterface $builder
-     * @param \Spryker\Zed\StateMachine\Business\StateMachine\HandlerResolverInterface $stateMachineHandlerResolver
-     * @param \Spryker\Zed\StateMachine\Persistence\StateMachineQueryContainerInterface $queryContainer
-     */
     public function __construct(
         BuilderInterface $builder,
         HandlerResolverInterface $stateMachineHandlerResolver,
@@ -367,11 +362,6 @@ class Finder implements FinderInterface
         return $stateMachineItemTransfer;
     }
 
-    /**
-     * @param \Orm\Zed\StateMachine\Persistence\SpyStateMachineItemState $stateMachineItemEntity
-     *
-     * @return int|null
-     */
     protected function getItemIdentifier(SpyStateMachineItemState $stateMachineItemEntity): ?int
     {
         if ($stateMachineItemEntity->getStateHistories()->count() === 0) {

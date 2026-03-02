@@ -115,9 +115,6 @@ class TestStateMachineHandler implements StateMachineHandlerInterface
         return $result;
     }
 
-    /**
-     * @return \Generated\Shared\Transfer\StateMachineItemTransfer
-     */
     public function getItemStateUpdated(): StateMachineItemTransfer
     {
         return $this->itemStateUpdated;

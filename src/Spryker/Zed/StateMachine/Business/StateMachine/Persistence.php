@@ -34,9 +34,6 @@ class Persistence implements PersistenceInterface
      */
     protected $stateMachineQueryContainer;
 
-    /**
-     * @param \Spryker\Zed\StateMachine\Persistence\StateMachineQueryContainerInterface $stateMachineQueryContainer
-     */
     public function __construct(StateMachineQueryContainerInterface $stateMachineQueryContainer)
     {
         $this->stateMachineQueryContainer = $stateMachineQueryContainer;

@@ -40,9 +40,6 @@ class FinderTest extends StateMachineMocks
      */
     public const TEST_STATE_MACHINE_NAME = 'TestStateMachine';
 
-    /**
-     * @return void
-     */
     public function testGetActiveProcessShouldReturnProcessesRegisteredByHandler(): void
     {
         $statemachineHandlerMock = $this->createStateMachineHandlerMock();
@@ -103,9 +100,6 @@ class FinderTest extends StateMachineMocks
         $this->assertCount(1, $manualEvents);
     }
 
-    /**
-     * @return void
-     */
     public function testGetItemWithFlagShouldReturnStatesMarkedWithGivenFlag(): void
     {
         $states = [];
@@ -169,13 +163,6 @@ class FinderTest extends StateMachineMocks
         $this->assertInstanceOf(StateMachineItemTransfer::class, $stateMachineItem);
     }
 
-    /**
-     * @param \Spryker\Zed\StateMachine\Business\StateMachine\HandlerResolverInterface|null $handlerResolverMock
-     * @param \Spryker\Zed\StateMachine\Business\StateMachine\BuilderInterface|null $builderMock
-     * @param \Spryker\Zed\StateMachine\Persistence\StateMachineQueryContainerInterface|null $stateMachineQueryContainerMock
-     *
-     * @return \Spryker\Zed\StateMachine\Business\StateMachine\Finder
-     */
     protected function createFinder(
         ?HandlerResolverInterface $handlerResolverMock = null,
         ?BuilderInterface $builderMock = null,

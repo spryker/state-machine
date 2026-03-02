@@ -11,9 +11,6 @@ use Spryker\Zed\StateMachine\StateMachineConfig as SprykerStateMachineConfig;
 
 class StateMachineConfig extends SprykerStateMachineConfig
 {
-    /**
-     * @return string
-     */
     public function getPathToStateMachineXmlFiles(): string
     {
         return realpath(__DIR__ . '/../_support/Fixtures');

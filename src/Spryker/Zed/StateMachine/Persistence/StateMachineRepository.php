@@ -17,11 +17,6 @@ use Spryker\Zed\Kernel\Persistence\AbstractRepository;
  */
 class StateMachineRepository extends AbstractRepository implements StateMachineRepositoryInterface
 {
-    /**
-     * @param \Generated\Shared\Transfer\StateMachineProcessCriteriaTransfer $stateMachineProcessCriteriaTransfer
-     *
-     * @return \Generated\Shared\Transfer\StateMachineProcessTransfer|null
-     */
     public function findStateMachineProcess(StateMachineProcessCriteriaTransfer $stateMachineProcessCriteriaTransfer): ?StateMachineProcessTransfer
     {
         $stateMachineProcessQuery = $this->getFactory()->createStateMachineProcessQuery();
@@ -41,12 +36,6 @@ class StateMachineRepository extends AbstractRepository implements StateMachineR
             );
     }
 
-    /**
-     * @param \Orm\Zed\StateMachine\Persistence\SpyStateMachineProcessQuery $stateMachineProcessQuery
-     * @param \Generated\Shared\Transfer\StateMachineProcessCriteriaTransfer $stateMachineProcessCriteriaTransfer
-     *
-     * @return \Orm\Zed\StateMachine\Persistence\SpyStateMachineProcessQuery
-     */
     protected function applyStateMachineProcessFilters(
         SpyStateMachineProcessQuery $stateMachineProcessQuery,
         StateMachineProcessCriteriaTransfer $stateMachineProcessCriteriaTransfer

@@ -32,9 +32,6 @@ class Timeout implements TimeoutInterface
      */
     protected $stateMachinePersistence;
 
-    /**
-     * @param \Spryker\Zed\StateMachine\Business\StateMachine\PersistenceInterface $stateMachinePersistence
-     */
     public function __construct(PersistenceInterface $stateMachinePersistence)
     {
         $this->stateMachinePersistence = $stateMachinePersistence;

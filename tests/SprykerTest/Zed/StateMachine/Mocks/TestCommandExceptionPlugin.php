@@ -12,11 +12,6 @@ use Generated\Shared\Transfer\StateMachineItemTransfer;
 
 class TestCommandExceptionPlugin extends TestCommandPlugin
 {
-    /**
-     * @param \Generated\Shared\Transfer\StateMachineItemTransfer $stateMachineItemTransfer
-     *
-     * @return bool
-     */
     public function run(StateMachineItemTransfer $stateMachineItemTransfer): bool
     {
         $this->throwTestException();

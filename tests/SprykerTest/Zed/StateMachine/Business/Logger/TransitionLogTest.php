@@ -28,9 +28,6 @@ use SprykerTest\Zed\StateMachine\Mocks\StateMachineMocks;
  */
 class TransitionLogTest extends StateMachineMocks
 {
-    /**
-     * @return void
-     */
     public function testLoggerPersistsAllProvidedData(): void
     {
         $stateMachineTransitionLogEntityMock = $this->createTransitionLogEntityMock();
@@ -72,9 +69,6 @@ class TransitionLogTest extends StateMachineMocks
         $this->assertSame($event->getName(), $stateMachineTransitionLogEntityMock->getEvent());
     }
 
-    /**
-     * @return void
-     */
     public function testWhenNonCliRequestUsedShouldExtractOutputParamsAndPersist(): void
     {
         $_SERVER[TransitionLog::QUERY_STRING] = 'one=1&two=2';
@@ -135,9 +129,6 @@ class TransitionLogTest extends StateMachineMocks
         return $utilNetworkServiceMock;
     }
 
-    /**
-     * @return \Generated\Shared\Transfer\StateMachineItemTransfer
-     */
     protected function createItemTransfer(): StateMachineItemTransfer
     {
         $stateMachineItemTransfer = new StateMachineItemTransfer();

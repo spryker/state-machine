@@ -22,11 +22,6 @@ class StateMachineHelper extends Module
 {
     use DataCleanupHelperTrait;
 
-    /**
-     * @param array $seedData
-     *
-     * @return \Orm\Zed\StateMachine\Persistence\SpyStateMachineProcess
-     */
     public function haveStateMachineProcess(array $seedData = []): SpyStateMachineProcess
     {
         $stateMachineProcessTransfer = (new StateMachineProcessBuilder($seedData))->build();
@@ -40,9 +35,6 @@ class StateMachineHelper extends Module
         return $stateMachineProcessEntity;
     }
 
-    /**
-     * @return \Orm\Zed\StateMachine\Persistence\SpyStateMachineProcess
-     */
     protected function createStateMachineProcessPropelEntity(): SpyStateMachineProcess
     {
         return new SpyStateMachineProcess();
@@ -90,17 +82,11 @@ class StateMachineHelper extends Module
         return $stateMachineItemStateHistoryTransfer->fromArray($stateMachineItemStateHistoryEntity->toArray(), true);
     }
 
-    /**
-     * @return \Orm\Zed\StateMachine\Persistence\SpyStateMachineItemState
-     */
     protected function createStateMachineItemStatePropelEntity(): SpyStateMachineItemState
     {
         return new SpyStateMachineItemState();
     }
 
-    /**
-     * @return \Orm\Zed\StateMachine\Persistence\SpyStateMachineItemStateHistory
-     */
     protected function createStateMachineItemStateHistoryPropelEntity(): SpyStateMachineItemStateHistory
     {
         return new SpyStateMachineItemStateHistory();

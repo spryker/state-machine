@@ -29,9 +29,6 @@ use SprykerTest\Zed\StateMachine\Mocks\StateMachineMocks;
  */
 class ItemLockTest extends StateMachineMocks
 {
-    /**
-     * @return void
-     */
     public function testAcquireLockShouldCreateItemWithLockInPersistence(): void
     {
         $stateMachineLockEntityMock = $this->createStateMachineItemLockEntityMock();
@@ -45,9 +42,6 @@ class ItemLockTest extends StateMachineMocks
         $this->assertTrue($lockResult);
     }
 
-    /**
-     * @return void
-     */
     public function testAcquireWhenPropelExceptionThrownShouldReThrowLockException(): void
     {
         // Arrange
@@ -63,9 +57,6 @@ class ItemLockTest extends StateMachineMocks
         $itemLock->acquire(sha1(1));
     }
 
-    /**
-     * @return void
-     */
     public function testReleaseLockShouldDeleteLockFromDatabase(): void
     {
         $stateMachineQueryContainerMock = $this->createStateMachineQueryContainerMock();
@@ -84,12 +75,6 @@ class ItemLockTest extends StateMachineMocks
         $itemLock->release(1);
     }
 
-    /**
-     * @param \Orm\Zed\StateMachine\Persistence\SpyStateMachineLock|null $stateMachineLockEntityMock
-     * @param \Spryker\Zed\StateMachine\Persistence\StateMachineQueryContainerInterface|null $stateMachineQueryContainerMock
-     *
-     * @return \Spryker\Zed\StateMachine\Business\Lock\ItemLockInterface
-     */
     protected function createItemLock(
         ?SpyStateMachineLock $stateMachineLockEntityMock = null,
         ?StateMachineQueryContainerInterface $stateMachineQueryContainerMock = null

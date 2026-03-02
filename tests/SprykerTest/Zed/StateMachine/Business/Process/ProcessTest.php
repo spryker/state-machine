@@ -25,9 +25,6 @@ use Spryker\Zed\StateMachine\Business\Process\Transition;
  */
 class ProcessTest extends Unit
 {
-    /**
-     * @return void
-     */
     public function testThatManualEventsIncludeOnEnterEvents(): void
     {
         $process = $this->createProcess();
@@ -40,9 +37,6 @@ class ProcessTest extends Unit
         $this->assertSame('onenter', $result[1]->getName());
     }
 
-    /**
-     * @return array
-     */
     protected function getTransitionsWithManualAndOnEnterEvents(): array
     {
         $transitions = [];
@@ -70,9 +64,6 @@ class ProcessTest extends Unit
         return $transitions;
     }
 
-    /**
-     * @return \Spryker\Zed\StateMachine\Business\Process\Process
-     */
     protected function createProcess(): Process
     {
         return new Process();

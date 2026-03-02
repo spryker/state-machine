@@ -45,9 +45,6 @@ class StateMachineFacadeExceptionTest extends Unit
      */
     public const TEST_PROCESS_NAME = 'TestProcess';
 
-    /**
-     * @return void
-     */
     public function testGetManualEventsForStateMachineItemShouldReturnAlsoOnEnterEventsForProvidedState(): void
     {
         $processName = static::TEST_PROCESS_NAME;
@@ -81,9 +78,6 @@ class StateMachineFacadeExceptionTest extends Unit
         $this->assertSame('send invoice', $manualEvent, 'Does not contain the onEnter event.');
     }
 
-    /**
-     * @return void
-     */
     public function testDrawProcessThrowsExceptionWhenXmlFileDoNotExist(): void
     {
         // Arrange
@@ -99,9 +93,6 @@ class StateMachineFacadeExceptionTest extends Unit
         $this->getStateMachineFacadeWithConfigMock()->drawProcess($stateMachineProcessTransfer);
     }
 
-    /**
-     * @return void
-     */
     public function testDrawProcessThrowsExceptionWhenFileExistsButNotWhitelisted(): void
     {
         // Arrange
@@ -117,11 +108,6 @@ class StateMachineFacadeExceptionTest extends Unit
         $this->getStateMachineFacadeWithConfigMock()->drawProcess($stateMachineProcessTransfer);
     }
 
-    /**
-     * @param \Spryker\Zed\StateMachine\Dependency\Plugin\StateMachineHandlerInterface $stateMachineHandler
-     *
-     * @return \Spryker\Zed\StateMachine\Business\StateMachineFacade
-     */
     protected function createStateMachineFacade(StateMachineHandlerInterface $stateMachineHandler): StateMachineFacade
     {
         $stateMachineBusinessFactory = new StateMachineBusinessFactory();
@@ -169,9 +155,6 @@ class StateMachineFacadeExceptionTest extends Unit
         return $stateMachineConfigMock;
     }
 
-    /**
-     * @return \Spryker\Zed\StateMachine\Business\StateMachineFacade
-     */
     protected function getStateMachineFacadeWithConfigMock(): StateMachineFacade
     {
         $stateMachineConfigMock = $this->getStateMachineConfigMock(

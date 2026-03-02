@@ -37,12 +37,6 @@ class StateUpdater implements StateUpdaterInterface
      */
     protected $stateMachineQueryContainer;
 
-    /**
-     * @param \Spryker\Zed\StateMachine\Business\StateMachine\TimeoutInterface $timeout
-     * @param \Spryker\Zed\StateMachine\Business\StateMachine\HandlerResolverInterface $stateMachineHandlerResolver
-     * @param \Spryker\Zed\StateMachine\Business\StateMachine\PersistenceInterface $stateMachinePersistence
-     * @param \Spryker\Zed\StateMachine\Persistence\StateMachineQueryContainerInterface $stateMachineQueryContainer
-     */
     public function __construct(
         TimeoutInterface $timeout,
         HandlerResolverInterface $stateMachineHandlerResolver,

@@ -12,11 +12,6 @@ use Spryker\Zed\StateMachine\Dependency\Plugin\CommandPluginInterface;
 
 class TestCommandPlugin implements CommandPluginInterface
 {
-    /**
-     * @param \Generated\Shared\Transfer\StateMachineItemTransfer $stateMachineItemTransfer
-     *
-     * @return bool
-     */
     public function run(StateMachineItemTransfer $stateMachineItemTransfer): bool
     {
         return true;

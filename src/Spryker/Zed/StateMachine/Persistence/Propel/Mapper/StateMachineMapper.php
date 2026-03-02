@@ -12,12 +12,6 @@ use Orm\Zed\StateMachine\Persistence\SpyStateMachineProcess;
 
 class StateMachineMapper
 {
-    /**
-     * @param \Orm\Zed\StateMachine\Persistence\SpyStateMachineProcess $stateMachineProcess
-     * @param \Generated\Shared\Transfer\StateMachineProcessTransfer $stateMachineProcessTransfer
-     *
-     * @return \Generated\Shared\Transfer\StateMachineProcessTransfer
-     */
     public function mapStateMachineProcessEntityToStateMachineProcessTransfer(
         SpyStateMachineProcess $stateMachineProcess,
         StateMachineProcessTransfer $stateMachineProcessTransfer

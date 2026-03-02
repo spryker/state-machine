@@ -12,11 +12,6 @@ use Spryker\Zed\StateMachine\Dependency\Plugin\ConditionPluginInterface;
 
 class TestConditionPlugin implements ConditionPluginInterface
 {
-    /**
-     * @param \Generated\Shared\Transfer\StateMachineItemTransfer $stateMachineItemTransfer
-     *
-     * @return bool
-     */
     public function check(StateMachineItemTransfer $stateMachineItemTransfer): bool
     {
         return true;

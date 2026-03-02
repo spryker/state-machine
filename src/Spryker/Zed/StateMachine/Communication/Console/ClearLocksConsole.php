@@ -29,9 +29,6 @@ class ClearLocksConsole extends Console
      */
     public const COMMAND_DESCRIPTION = 'Clear expired locks from lock table';
 
-    /**
-     * @return void
-     */
     protected function configure(): void
     {
         $this->setName(static::COMMAND_NAME);
@@ -40,12 +37,6 @@ class ClearLocksConsole extends Console
         parent::configure();
     }
 
-    /**
-     * @param \Symfony\Component\Console\Input\InputInterface $input
-     * @param \Symfony\Component\Console\Output\OutputInterface $output
-     *
-     * @return int
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->getFacade()->clearLocks();

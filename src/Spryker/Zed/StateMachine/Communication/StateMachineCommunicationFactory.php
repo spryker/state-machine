@@ -40,17 +40,11 @@ class StateMachineCommunicationFactory extends AbstractCommunicationFactory
         return $this->getConfig();
     }
 
-    /**
-     * @return \Spryker\Zed\StateMachine\Communication\Form\DataProvider\EventTriggerFormDataProvider
-     */
     public function createEventTriggerFormDataProvider(): EventTriggerFormDataProvider
     {
         return new EventTriggerFormDataProvider();
     }
 
-    /**
-     * @return \Spryker\Zed\StateMachine\Communication\Form\DataProvider\EventItemTriggerFormDataProvider
-     */
     public function createEventItemTriggerFormDataProvider(): EventItemTriggerFormDataProvider
     {
         return new EventItemTriggerFormDataProvider();
@@ -76,9 +70,6 @@ class StateMachineCommunicationFactory extends AbstractCommunicationFactory
         return $this->getFormFactory()->create(EventItemTriggerForm::class, null, $options);
     }
 
-    /**
-     * @return \Spryker\Zed\StateMachine\Dependency\Service\StateMachineToUtilSanitizeXssServiceInterface
-     */
     public function getUtilSanitizeXssService(): StateMachineToUtilSanitizeXssServiceInterface
     {
         return $this->getProvidedDependency(StateMachineDependencyProvider::SERVICE_UTIL_SANITIZE_XSS);

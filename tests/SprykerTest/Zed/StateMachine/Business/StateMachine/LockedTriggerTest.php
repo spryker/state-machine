@@ -27,9 +27,6 @@ use SprykerTest\Zed\StateMachine\Mocks\StateMachineMocks;
  */
 class LockedTriggerTest extends StateMachineMocks
 {
-    /**
-     * @return void
-     */
     public function testTriggerForNewItemWhenLockedShouldThrowException(): void
     {
         $this->expectException(LockException::class);
@@ -45,9 +42,6 @@ class LockedTriggerTest extends StateMachineMocks
         $lockedTrigger->triggerForNewStateMachineItem(new StateMachineProcessTransfer(), 1);
     }
 
-    /**
-     * @return void
-     */
     public function testTriggerEventForNewItemWhenLockedShouldThrowException(): void
     {
         $this->expectException(LockException::class);
@@ -63,12 +57,6 @@ class LockedTriggerTest extends StateMachineMocks
         $lockedTrigger->triggerEvent('event', []);
     }
 
-    /**
-     * @param \Spryker\Zed\StateMachine\Business\StateMachine\TriggerInterface|null $triggerMock
-     * @param \Spryker\Zed\StateMachine\Business\Lock\ItemLockInterface|null $itemLockMock
-     *
-     * @return \Spryker\Zed\StateMachine\Business\StateMachine\LockedTrigger
-     */
     public function createLockedTrigger(?TriggerInterface $triggerMock = null, ?ItemLockInterface $itemLockMock = null): LockedTrigger
     {
         if ($triggerMock === null) {

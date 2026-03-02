@@ -35,9 +35,6 @@ class TimeoutTest extends StateMachineMocks
      */
     public const STATE_WITH_TIMEOUT = 'State with timeout';
 
-    /**
-     * @return void
-     */
     public function testSetTimeoutShouldStoreNewTimeout(): void
     {
         $stateMachinePersistenceMock = $this->createPersistenceMock();
@@ -61,9 +58,6 @@ class TimeoutTest extends StateMachineMocks
         );
     }
 
-    /**
-     * @return void
-     */
     public function testDropOldTimeoutShouldRemoveExpiredTimeoutsFromPersistence(): void
     {
         $stateMachinePersistenceMock = $this->createPersistenceMock();
@@ -80,9 +74,6 @@ class TimeoutTest extends StateMachineMocks
         );
     }
 
-    /**
-     * @return \Spryker\Zed\StateMachine\Business\Process\Process
-     */
     protected function createProcess(): Process
     {
         $process = new Process();
@@ -102,9 +93,6 @@ class TimeoutTest extends StateMachineMocks
         return $process;
     }
 
-    /**
-     * @return \Generated\Shared\Transfer\StateMachineItemTransfer
-     */
     protected function createStateMachineItemTransfer(): StateMachineItemTransfer
     {
         $stateMachineItemTransfer = new StateMachineItemTransfer();
@@ -113,11 +101,6 @@ class TimeoutTest extends StateMachineMocks
         return $stateMachineItemTransfer;
     }
 
-    /**
-     * @param \Spryker\Zed\StateMachine\Business\StateMachine\PersistenceInterface $persistenceMock
-     *
-     * @return \Spryker\Zed\StateMachine\Business\StateMachine\Timeout
-     */
     protected function createTimeout(PersistenceInterface $persistenceMock): Timeout
     {
         if ($persistenceMock === null) {

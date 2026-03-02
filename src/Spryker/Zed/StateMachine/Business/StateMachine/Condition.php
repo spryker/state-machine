@@ -52,13 +52,6 @@ class Condition implements ConditionInterface
      */
     protected $stateUpdater;
 
-    /**
-     * @param \Spryker\Zed\StateMachine\Business\Logger\TransitionLogInterface $transitionLog
-     * @param \Spryker\Zed\StateMachine\Business\StateMachine\HandlerResolverInterface $stateMachineHandlerResolver
-     * @param \Spryker\Zed\StateMachine\Business\StateMachine\FinderInterface $finder
-     * @param \Spryker\Zed\StateMachine\Business\StateMachine\PersistenceInterface $stateMachinePersistence
-     * @param \Spryker\Zed\StateMachine\Business\StateMachine\StateUpdaterInterface $stateUpdate
-     */
     public function __construct(
         TransitionLogInterface $transitionLog,
         HandlerResolverInterface $stateMachineHandlerResolver,

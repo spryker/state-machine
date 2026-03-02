@@ -30,9 +30,6 @@ use Spryker\Zed\StateMachine\StateMachineConfig;
  */
 class BuilderTest extends Unit
 {
-    /**
-     * @return void
-     */
     public function testCreateProcessShouldReturnProcessInstance(): void
     {
         $builder = $this->createBuilder();
@@ -42,9 +39,6 @@ class BuilderTest extends Unit
         $this->assertInstanceOf(Process::class, $process);
     }
 
-    /**
-     * @return void
-     */
     public function testCreateProcessShouldIncludeAllStatesFromXml(): void
     {
         $builder = $this->createBuilder();
@@ -55,9 +49,6 @@ class BuilderTest extends Unit
         $this->assertInstanceOf(State::class, $process->getStates()['completed']);
     }
 
-    /**
-     * @return void
-     */
     public function testCreateProcessShouldIncludeAllTransitions(): void
     {
         $builder = $this->createBuilder();
@@ -68,9 +59,6 @@ class BuilderTest extends Unit
         $this->assertInstanceOf(Transition::class, $process->getTransitions()[0]);
     }
 
-    /**
-     * @return void
-     */
     public function testCreateProcessShouldIncludeAllSubProcesses(): void
     {
         $builder = $this->createBuilder();
@@ -80,9 +68,6 @@ class BuilderTest extends Unit
         $this->assertCount(2, $process->getSubProcesses());
     }
 
-    /**
-     * @return void
-     */
     public function testCreateProcessShouldFlagMainProcess(): void
     {
         $builder = $this->createBuilder();
@@ -92,9 +77,6 @@ class BuilderTest extends Unit
         $this->assertTrue($process->getIsMain());
     }
 
-    /**
-     * @return void
-     */
     public function testCreateProcessShouldThrowExceptionWhenStateMachineXmlFileNotFound(): void
     {
         // Arrange
@@ -109,9 +91,6 @@ class BuilderTest extends Unit
         $builder->createProcess($stateMachineProcessTransfer);
     }
 
-    /**
-     * @return void
-     */
     public function testCreateProcessShouldThrowExceptionWhenProcessXmlFileNotFound(): void
     {
         // Arrange
@@ -126,9 +105,6 @@ class BuilderTest extends Unit
         $builder->createProcess($stateMachineProcessTransfer);
     }
 
-    /**
-     * @return void
-     */
     public function testSubProcessPrefixIsApplied(): void
     {
         $builder = $this->createBuilder();
@@ -141,9 +117,6 @@ class BuilderTest extends Unit
         $this->assertSame('Leave Sub-process 2', $manualEventsBySource['Foo 1 - done'][0]);
     }
 
-    /**
-     * @return \Spryker\Zed\StateMachine\Business\StateMachine\Builder
-     */
     protected function createBuilder(): Builder
     {
         return new Builder(
@@ -155,41 +128,26 @@ class BuilderTest extends Unit
         );
     }
 
-    /**
-     * @return \Spryker\Zed\StateMachine\Business\Process\Event
-     */
     protected function createEvent(): Event
     {
         return new Event();
     }
 
-    /**
-     * @return \Spryker\Zed\StateMachine\Business\Process\State
-     */
     protected function createState(): State
     {
         return new State();
     }
 
-    /**
-     * @return \Spryker\Zed\StateMachine\Business\Process\Transition
-     */
     protected function createTransition(): Transition
     {
         return new Transition();
     }
 
-    /**
-     * @return \Spryker\Zed\StateMachine\Business\Process\Process
-     */
     protected function createProcess(): Process
     {
         return new Process();
     }
 
-    /**
-     * @return \Spryker\Zed\StateMachine\StateMachineConfig
-     */
     protected function createStateMachineConfig(): StateMachineConfig
     {
         $stateMachineConfigMock = $this->getMockBuilder(StateMachineConfig::class)->getMock();
@@ -201,9 +159,6 @@ class BuilderTest extends Unit
         return $stateMachineConfigMock;
     }
 
-    /**
-     * @return \Generated\Shared\Transfer\StateMachineProcessTransfer
-     */
     protected function createStateMachineProcessTransfer(): StateMachineProcessTransfer
     {
         $stateMachineProcessTransfer = new StateMachineProcessTransfer();

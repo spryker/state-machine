@@ -60,9 +60,6 @@ class TriggerTest extends StateMachineMocks
      */
     public const TEST_COMMAND = 'TestCommand';
 
-    /**
-     * @return void
-     */
     public function testTriggerForNewItemShouldExecutedSMAndPersistNewItem(): void
     {
         $stateMachinePersistenceMock = $this->createPersistenceMock();
@@ -117,9 +114,6 @@ class TriggerTest extends StateMachineMocks
         $this->assertSame(1, $affectedItems);
     }
 
-    /**
-     * @return void
-     */
     public function testTriggerEventShouldTriggerSmForGiveItems(): void
     {
         $stateMachinePersistenceMock = $this->createTriggerPersistenceMock();
@@ -147,9 +141,6 @@ class TriggerTest extends StateMachineMocks
         $this->assertSame(1, $affectedItems);
     }
 
-    /**
-     * @return void
-     */
     public function testTriggerConditionsWithoutEventShouldExecuteConditionCheckAndTriggerEvents(): void
     {
         $stateMachinePersistenceMock = $this->createTriggerPersistenceMock();
@@ -173,9 +164,6 @@ class TriggerTest extends StateMachineMocks
         $this->assertSame(1, $affectedItems);
     }
 
-    /**
-     * @return void
-     */
     public function testTriggerForTimeoutExpiredItemsShouldExecuteSMOnItemsWithExpiredTimeout(): void
     {
         $stateMachinePersistenceMock = $this->createTriggerPersistenceMock();
@@ -199,9 +187,6 @@ class TriggerTest extends StateMachineMocks
         $this->assertSame(1, $affectedItems);
     }
 
-    /**
-     * @return void
-     */
     public function testTriggerShouldLogTransitionsForTriggerEvent(): void
     {
         $stateMachinePersistenceMock = $this->createTriggerPersistenceMock();
@@ -278,16 +263,6 @@ class TriggerTest extends StateMachineMocks
         return $items;
     }
 
-    /**
-     * @param \Spryker\Zed\StateMachine\Business\Logger\TransitionLogInterface|null $transitionLogMock
-     * @param \Spryker\Zed\StateMachine\Business\StateMachine\FinderInterface|null $finderMock
-     * @param \Spryker\Zed\StateMachine\Business\StateMachine\PersistenceInterface|null $persistenceMock
-     * @param \Spryker\Zed\StateMachine\Business\StateMachine\ConditionInterface|null $conditionMock
-     * @param \Spryker\Zed\StateMachine\Business\StateMachine\StateUpdaterInterface|null $stateUpdaterMock
-     * @param \Spryker\Zed\StateMachine\Business\StateMachine\HandlerResolverInterface|null $handlerResolverMock
-     *
-     * @return \Spryker\Zed\StateMachine\Business\StateMachine\Trigger
-     */
     protected function createTrigger(
         ?TransitionLogInterface $transitionLogMock = null,
         ?FinderInterface $finderMock = null,
@@ -408,9 +383,6 @@ class TriggerTest extends StateMachineMocks
         return $transitionLogMock;
     }
 
-    /**
-     * @return \Generated\Shared\Transfer\StateMachineItemTransfer
-     */
     protected function createTriggerStateMachineItem(): StateMachineItemTransfer
     {
         $stateMachineItemTransfer = new StateMachineItemTransfer();
