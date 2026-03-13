@@ -1,8 +1,8 @@
 @import '~drift-zoom/dist/drift-basic.css';
 
 .preview-image {
-    box-shadow: 5px 5px 7px #818181;
-    border: 1px dotted #333;
+    background: var(--ins-secondary-bg);
+    border: 1px solid var(--ins-border-color);
     padding: 2px;
     width: 250px;
     height: 500px;
