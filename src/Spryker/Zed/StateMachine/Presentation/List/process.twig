@@ -17,7 +17,12 @@
                                 <h2>{{ process.processName }}</h2>
                             </div>
                             <div class="panel-body">
-                                <a href="{{ url('/state-machine/graph/draw', {process: process.processName, 'state-machine': stateMachineName}) }}" target="_blank">{{ process.processName }}</a>
+                                {% set visualizerLink = include('@StateMachineVisualizer/Partial/link.twig', {stateMachineType: 'state-machine', processName: process.processName, stateMachine: stateMachineName}, false, true) %}
+                                {% if visualizerLink %}
+                                    {{ visualizerLink | raw }}
+                                {% else %}
+                                    <a href="{{ url('/state-machine/graph/draw', {process: process.processName, 'state-machine': stateMachineName}) }}" target="_blank">{{ process.processName }}</a>
+                                {% endif %}
                                 <a style="font-size:10px;" href="{{ url('/state-machine/graph/draw-preview-version', {process: process.processName, 'state-machine': stateMachineName}) }}" target="_blank">[{{ 'preview-version' | trans }}]</a>
                             </div>
 

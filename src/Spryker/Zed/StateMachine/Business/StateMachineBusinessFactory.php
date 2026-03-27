@@ -14,8 +14,12 @@ use Spryker\Zed\StateMachine\Business\Logger\PathFinder;
 use Spryker\Zed\StateMachine\Business\Logger\TransitionLog;
 use Spryker\Zed\StateMachine\Business\Process\Event;
 use Spryker\Zed\StateMachine\Business\Process\Process;
+use Spryker\Zed\StateMachine\Business\Process\ProcessDataProvider;
+use Spryker\Zed\StateMachine\Business\Process\ProcessDataProviderInterface;
 use Spryker\Zed\StateMachine\Business\Process\State;
 use Spryker\Zed\StateMachine\Business\Process\Transition;
+use Spryker\Zed\StateMachine\Business\Resolver\PathResolver;
+use Spryker\Zed\StateMachine\Business\Resolver\PathResolverInterface;
 use Spryker\Zed\StateMachine\Business\StateMachine\Builder;
 use Spryker\Zed\StateMachine\Business\StateMachine\Condition;
 use Spryker\Zed\StateMachine\Business\StateMachine\Finder;
@@ -110,7 +114,13 @@ class StateMachineBusinessFactory extends AbstractBusinessFactory
             $this->createProcessTransition(),
             $this->createProcessProcess(),
             $this->getConfig(),
+            $this->createPathResolver(),
         );
+    }
+
+    public function createPathResolver(): PathResolverInterface
+    {
+        return new PathResolver($this->getConfig());
     }
 
     /**
@@ -132,6 +142,14 @@ class StateMachineBusinessFactory extends AbstractBusinessFactory
     {
         return new Timeout(
             $this->createStateMachinePersistence(),
+        );
+    }
+
+    public function createProcessDataProvider(): ProcessDataProviderInterface
+    {
+        return new ProcessDataProvider(
+            $this->createPathResolver(),
+            $this->createHandlerResolver(),
         );
     }
 

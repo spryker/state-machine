@@ -14,6 +14,7 @@ use Spryker\Zed\StateMachine\Business\Process\EventInterface;
 use Spryker\Zed\StateMachine\Business\Process\ProcessInterface;
 use Spryker\Zed\StateMachine\Business\Process\StateInterface;
 use Spryker\Zed\StateMachine\Business\Process\TransitionInterface;
+use Spryker\Zed\StateMachine\Business\Resolver\PathResolverInterface;
 use Spryker\Zed\StateMachine\StateMachineConfig;
 
 class Builder implements BuilderInterface
@@ -83,43 +84,14 @@ class Builder implements BuilderInterface
      */
     protected static $processBuffer = [];
 
-    /**
-     * @var \Spryker\Zed\StateMachine\Business\Process\EventInterface
-     */
-    protected $event;
-
-    /**
-     * @var \Spryker\Zed\StateMachine\Business\Process\StateInterface
-     */
-    protected $state;
-
-    /**
-     * @var \Spryker\Zed\StateMachine\Business\Process\TransitionInterface
-     */
-    protected $transition;
-
-    /**
-     * @var \Spryker\Zed\StateMachine\Business\Process\ProcessInterface
-     */
-    protected $process;
-
-    /**
-     * @var \Spryker\Zed\StateMachine\StateMachineConfig
-     */
-    protected $stateMachineConfig;
-
     public function __construct(
-        EventInterface $event,
-        StateInterface $state,
-        TransitionInterface $transition,
-        ProcessInterface $process,
-        StateMachineConfig $stateMachineConfig
+        protected EventInterface $event,
+        protected StateInterface $state,
+        protected TransitionInterface $transition,
+        protected ProcessInterface $process,
+        protected StateMachineConfig $stateMachineConfig,
+        protected PathResolverInterface $pathResolver
     ) {
-        $this->event = $event;
-        $this->state = $state;
-        $this->transition = $transition;
-        $this->process = $process;
-        $this->stateMachineConfig = $stateMachineConfig;
     }
 
     /**
@@ -134,7 +106,7 @@ class Builder implements BuilderInterface
             return static::$processBuffer[$processIdentifier];
         }
 
-        $pathToXml = $this->buildPathToXml($stateMachineProcessTransfer);
+        $pathToXml = $this->pathResolver->buildPathToXml($stateMachineProcessTransfer);
         $this->rootElement = $this->loadXmlFromProcessName($pathToXml, $stateMachineProcessTransfer->getProcessName());
 
         $this->mergeSubProcessFiles($pathToXml);
@@ -261,17 +233,7 @@ class Builder implements BuilderInterface
      */
     protected function loadXmlFromFileName($pathToXml, $fileName)
     {
-        $pathToXml = $pathToXml . DIRECTORY_SEPARATOR . $fileName . '.xml';
-
-        if (!$this->isValidPath($pathToXml)) {
-            throw new StateMachineException(
-                sprintf(
-                    'State machine XML file not found in "%s".',
-                    str_replace(APPLICATION_ROOT_DIR, '', $this->stateMachineConfig->getPathToStateMachineXmlFiles()),
-                ),
-            );
-        }
-
+        $pathToXml = $this->pathResolver->getXmlFromFileName($pathToXml, $fileName);
         $xmlContents = file_get_contents($pathToXml);
         if ($xmlContents === false) {
             throw new StateMachineException(
@@ -283,14 +245,6 @@ class Builder implements BuilderInterface
         }
 
         return $this->loadXml($xmlContents);
-    }
-
-    protected function isValidPath(string $pathToXml): bool
-    {
-        $realPathToXml = realpath($pathToXml);
-        $realPathToStateMachineXmlFiles = realpath($this->stateMachineConfig->getPathToStateMachineXmlFiles());
-
-        return $realPathToXml && strpos($realPathToXml, $realPathToStateMachineXmlFiles . '/') === 0;
     }
 
     /**
@@ -649,18 +603,6 @@ class Builder implements BuilderInterface
             ->requireProcessName();
 
         return $stateMachineProcessTransfer->getStateMachineName() . '-' . $stateMachineProcessTransfer->getProcessName();
-    }
-
-    /**
-     * @param \Generated\Shared\Transfer\StateMachineProcessTransfer $stateMachineProcessTransfer
-     *
-     * @return string
-     */
-    protected function buildPathToXml(StateMachineProcessTransfer $stateMachineProcessTransfer)
-    {
-        $stateMachineProcessTransfer->requireStateMachineName();
-
-        return $this->stateMachineConfig->getPathToStateMachineXmlFiles() . DIRECTORY_SEPARATOR . $stateMachineProcessTransfer->getStateMachineName();
     }
 
     /**

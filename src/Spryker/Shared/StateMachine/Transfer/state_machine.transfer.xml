@@ -46,4 +46,15 @@
         <property name="collection" type="array" singular="aclEntityMetadata" associative="true"/>
     </transfer>
 
+    <transfer name="ProcessCriteria" strict="true">
+        <property name="processName" type="string"/>
+        <property name="stateMachineName" type="string"/>
+    </transfer>
+
+    <transfer name="ProcessData" strict="true">
+        <property name="processFilePath" type="string"/>
+        <property name="commands" type="string[]" associative="true" singular="command" description="A collection of commands: command name =&gt; type"/>
+        <property name="conditions" type="string[]" associative="true" singular="condition" description="A collection of conditions: condition name =&gt; type"/>
+    </transfer>
+
 </transfers>

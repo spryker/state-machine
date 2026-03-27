@@ -14,6 +14,7 @@ use Spryker\Zed\StateMachine\Business\Process\Event;
 use Spryker\Zed\StateMachine\Business\Process\Process;
 use Spryker\Zed\StateMachine\Business\Process\State;
 use Spryker\Zed\StateMachine\Business\Process\Transition;
+use Spryker\Zed\StateMachine\Business\Resolver\PathResolver;
 use Spryker\Zed\StateMachine\Business\StateMachine\Builder;
 use Spryker\Zed\StateMachine\StateMachineConfig;
 
@@ -119,12 +120,15 @@ class BuilderTest extends Unit
 
     protected function createBuilder(): Builder
     {
+        $config = $this->createStateMachineConfig();
+
         return new Builder(
             $this->createEvent(),
             $this->createState(),
             $this->createTransition(),
             $this->createProcess(),
-            $this->createStateMachineConfig(),
+            $config,
+            new PathResolver($config),
         );
     }
 

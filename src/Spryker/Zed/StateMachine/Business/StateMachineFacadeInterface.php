@@ -7,6 +7,8 @@
 
 namespace Spryker\Zed\StateMachine\Business;
 
+use Generated\Shared\Transfer\ProcessCriteriaTransfer;
+use Generated\Shared\Transfer\ProcessDataTransfer;
 use Generated\Shared\Transfer\StateMachineItemTransfer;
 use Generated\Shared\Transfer\StateMachineProcessCriteriaTransfer;
 use Generated\Shared\Transfer\StateMachineProcessTransfer;
@@ -282,4 +284,15 @@ interface StateMachineFacadeInterface
      * @return array<string>
      */
     public function getProcessStateNames(StateMachineProcessTransfer $stateMachineProcessTransfer): array;
+
+    /**
+     * Specification:
+     * - Returns process data for the given state machine process transfer.
+     * - Returns the process XML file path.
+     * - Returns command plugins indexed by command name with an empty string as value.
+     * - Returns condition plugins indexed by condition name with an empty string as value.
+     *
+     * @api
+     */
+    public function getProcessData(ProcessCriteriaTransfer $processCriteriaTransfer): ProcessDataTransfer;
 }

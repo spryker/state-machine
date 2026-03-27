@@ -7,6 +7,8 @@
 
 namespace Spryker\Zed\StateMachine\Business;
 
+use Generated\Shared\Transfer\ProcessCriteriaTransfer;
+use Generated\Shared\Transfer\ProcessDataTransfer;
 use Generated\Shared\Transfer\StateMachineItemTransfer;
 use Generated\Shared\Transfer\StateMachineProcessCriteriaTransfer;
 use Generated\Shared\Transfer\StateMachineProcessTransfer;
@@ -335,5 +337,17 @@ class StateMachineFacade extends AbstractFacade implements StateMachineFacadeInt
     public function getProcessStateNames(StateMachineProcessTransfer $stateMachineProcessTransfer): array
     {
         return $this->getFactory()->createStateMachineFinder()->getProcessStates($stateMachineProcessTransfer);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @api
+     */
+    public function getProcessData(ProcessCriteriaTransfer $processCriteriaTransfer): ProcessDataTransfer
+    {
+        return $this->getFactory()
+            ->createProcessDataProvider()
+            ->getProcessData($processCriteriaTransfer);
     }
 }
