@@ -8,10 +8,10 @@
 
 {% block head_css %}
     {{ parent() }}
-    <link rel="stylesheet" href="/assets/css/spryker-zed-statemachine-main.css">
+    <link rel="stylesheet" href="{{ assetsPath('css/spryker-zed-statemachine-main.css') }}">
 {% endblock %}
 
 {% block footer_js %}
     {{ parent() }}
-    <script type="text/javascript" src="/assets/js/spryker-zed-statemachine-main.js"></script>
+    <script type="text/javascript" src="{{ assetsPath('js/spryker-zed-statemachine-main.js') }}"></script>
 {% endblock %}
