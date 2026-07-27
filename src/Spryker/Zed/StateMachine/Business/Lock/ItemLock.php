@@ -8,6 +8,7 @@
 namespace Spryker\Zed\StateMachine\Business\Lock;
 
 use DateInterval;
+use DateMalformedIntervalStringException;
 use DateTime;
 use Orm\Zed\StateMachine\Persistence\SpyStateMachineLock;
 use Propel\Runtime\Exception\PropelException;
@@ -96,11 +97,16 @@ class ItemLock implements ItemLockInterface
      */
     protected function createExpirationDate()
     {
-        $dateInterval = DateInterval::createFromDateString(
-            $this->stateMachineConfig->getStateMachineItemLockExpirationInterval(),
-        );
-        if ($dateInterval === false) {
-            throw new RuntimeException('Cannot create a DateInterval from `StateMachineConfig::getStateMachineItemLockExpirationInterval()`');
+        $itemLockExpirationInterval = $this->stateMachineConfig->getStateMachineItemLockExpirationInterval();
+
+        try {
+            $dateInterval = DateInterval::createFromDateString($itemLockExpirationInterval);
+        } catch (DateMalformedIntervalStringException $exception) {
+            throw new RuntimeException(
+                sprintf('Cannot create a DateInterval from `StateMachineConfig::getStateMachineItemLockExpirationInterval()` value "%s".', $itemLockExpirationInterval),
+                0,
+                $exception,
+            );
         }
 
         $expirationDate = new DateTime();

@@ -8,6 +8,7 @@
 namespace Spryker\Zed\StateMachine\Business\StateMachine;
 
 use DateInterval;
+use DateMalformedIntervalStringException;
 use DateTime;
 use Generated\Shared\Transfer\StateMachineItemTransfer;
 use RuntimeException;
@@ -98,9 +99,15 @@ class Timeout implements TimeoutInterface
     {
         if (!isset($this->eventToTimeoutBuffer[$event->getName()])) {
             $timeout = $event->getTimeout();
-            $interval = DateInterval::createFromDateString($timeout);
-            if ($interval === false) {
-                throw new RuntimeException('Cannot create a DateInterval from `$event->getTimeout()`');
+
+            try {
+                $interval = DateInterval::createFromDateString($timeout);
+            } catch (DateMalformedIntervalStringException $exception) {
+                throw new RuntimeException(
+                    sprintf('Cannot create a DateInterval from `$event->getTimeout()` value "%s".', $timeout),
+                    0,
+                    $exception,
+                );
             }
 
             $this->validateTimeout($interval, $timeout);
