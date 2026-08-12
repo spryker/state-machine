@@ -37,16 +37,23 @@ class StateUpdater implements StateUpdaterInterface
      */
     protected $stateMachineQueryContainer;
 
+    /**
+     * @var \Spryker\Zed\StateMachine\Business\StateMachine\ProcessKeyBuilderInterface
+     */
+    protected $processKeyBuilder;
+
     public function __construct(
         TimeoutInterface $timeout,
         HandlerResolverInterface $stateMachineHandlerResolver,
         PersistenceInterface $stateMachinePersistence,
-        StateMachineQueryContainerInterface $stateMachineQueryContainer
+        StateMachineQueryContainerInterface $stateMachineQueryContainer,
+        ProcessKeyBuilderInterface $processKeyBuilder
     ) {
         $this->timeout = $timeout;
         $this->stateMachineHandlerResolver = $stateMachineHandlerResolver;
         $this->stateMachinePersistence = $stateMachinePersistence;
         $this->stateMachineQueryContainer = $stateMachineQueryContainer;
+        $this->processKeyBuilder = $processKeyBuilder;
     }
 
     /**
@@ -86,7 +93,7 @@ class StateUpdater implements StateUpdaterInterface
     ) {
         $this->assertStateMachineItemHaveRequiredData($stateMachineItemTransfer);
 
-        $process = $processes[$stateMachineItemTransfer->getProcessName()];
+        $process = $processes[$this->processKeyBuilder->getProcessKey((string)$stateMachineItemTransfer->getProcessName(), $stateMachineItemTransfer->getVersion())];
 
         $this->assertSourceStateExists($sourceStates, $stateMachineItemTransfer);
 

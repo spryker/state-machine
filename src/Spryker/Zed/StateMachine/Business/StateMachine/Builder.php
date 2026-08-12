@@ -15,6 +15,7 @@ use Spryker\Zed\StateMachine\Business\Process\ProcessInterface;
 use Spryker\Zed\StateMachine\Business\Process\StateInterface;
 use Spryker\Zed\StateMachine\Business\Process\TransitionInterface;
 use Spryker\Zed\StateMachine\Business\Resolver\PathResolverInterface;
+use Spryker\Zed\StateMachine\Dependency\Plugin\PersistentStateMachineHandlerInterface;
 use Spryker\Zed\StateMachine\StateMachineConfig;
 
 class Builder implements BuilderInterface
@@ -90,7 +91,8 @@ class Builder implements BuilderInterface
         protected TransitionInterface $transition,
         protected ProcessInterface $process,
         protected StateMachineConfig $stateMachineConfig,
-        protected PathResolverInterface $pathResolver
+        protected PathResolverInterface $pathResolver,
+        protected HandlerResolverInterface $stateMachineHandlerResolver
     ) {
     }
 
@@ -107,7 +109,7 @@ class Builder implements BuilderInterface
         }
 
         $pathToXml = $this->pathResolver->buildPathToXml($stateMachineProcessTransfer);
-        $this->rootElement = $this->loadXmlFromProcessName($pathToXml, $stateMachineProcessTransfer->getProcessName());
+        $this->rootElement = $this->loadXmlForProcess($stateMachineProcessTransfer, $pathToXml);
 
         $this->mergeSubProcessFiles($pathToXml);
 
@@ -127,6 +129,41 @@ class Builder implements BuilderInterface
     }
 
     /**
+     * @param \Generated\Shared\Transfer\StateMachineProcessTransfer $stateMachineProcessTransfer
+     * @param string $pathToXml
+     *
+     * @return \SimpleXMLElement
+     */
+    protected function loadXmlForProcess(StateMachineProcessTransfer $stateMachineProcessTransfer, $pathToXml)
+    {
+        $processName = $stateMachineProcessTransfer->getProcessName();
+        $stateMachineHandler = $this->findStateMachineHandler($stateMachineProcessTransfer);
+
+        if ($stateMachineHandler instanceof PersistentStateMachineHandlerInterface) {
+            $definitionXml = $stateMachineHandler->getDefinitionXmlForPersistentProcess($stateMachineProcessTransfer);
+            if ($definitionXml != null) {
+                return $this->loadXml($definitionXml);
+            }
+        }
+
+        return $this->loadXmlFromProcessName($pathToXml, $processName);
+    }
+
+    /**
+     * @param \Generated\Shared\Transfer\StateMachineProcessTransfer $stateMachineProcessTransfer
+     *
+     * @return \Spryker\Zed\StateMachine\Dependency\Plugin\StateMachineHandlerInterface|null
+     */
+    protected function findStateMachineHandler(StateMachineProcessTransfer $stateMachineProcessTransfer)
+    {
+        if ($stateMachineProcessTransfer->getStateMachineName() === null) {
+            return null;
+        }
+
+        return $this->stateMachineHandlerResolver->find($stateMachineProcessTransfer->getStateMachineName());
+    }
+
+    /**
      * @param string $pathToXml
      *
      * @return void
@@ -137,7 +174,7 @@ class Builder implements BuilderInterface
             $processFile = $this->getAttributeString($xmlProcess, static::PROCESS_FILE_ATTRIBUTE);
 
             if ($processFile === null) {
-                 continue;
+                continue;
             }
 
             $processName = $this->getAttributeString($xmlProcess, 'name');
@@ -602,7 +639,14 @@ class Builder implements BuilderInterface
         $stateMachineProcessTransfer->requireStateMachineName()
             ->requireProcessName();
 
-        return $stateMachineProcessTransfer->getStateMachineName() . '-' . $stateMachineProcessTransfer->getProcessName();
+        $processIdentifier = $stateMachineProcessTransfer->getStateMachineName()
+            . '-' . $stateMachineProcessTransfer->getProcessName();
+
+        if ($stateMachineProcessTransfer->getVersion() !== null) {
+            $processIdentifier .= '-' . $stateMachineProcessTransfer->getVersion();
+        }
+
+        return $processIdentifier;
     }
 
     /**

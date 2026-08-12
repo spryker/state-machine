@@ -121,6 +121,10 @@ class StateMachineFacadeExceptionTest extends Unit
             ];
         };
 
+        $container[StateMachineDependencyProvider::PLUGINS_STATE_MACHINE_HANDLER_RESOLVER] = function () {
+            return [];
+        };
+
         $container[StateMachineDependencyProvider::PLUGIN_GRAPH] = function () {
             return new GraphPlugin();
         };

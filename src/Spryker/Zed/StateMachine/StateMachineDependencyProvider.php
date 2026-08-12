@@ -25,6 +25,11 @@ class StateMachineDependencyProvider extends AbstractBundleDependencyProvider
     /**
      * @var string
      */
+    public const PLUGINS_STATE_MACHINE_HANDLER_RESOLVER = 'PLUGINS_STATE_MACHINE_HANDLER_RESOLVER';
+
+    /**
+     * @var string
+     */
     public const PLUGIN_GRAPH = 'PLUGIN_GRAPH';
 
     /**
@@ -56,6 +61,8 @@ class StateMachineDependencyProvider extends AbstractBundleDependencyProvider
             return $container->getLocator()->utilNetwork()->service();
         });
 
+        $container = $this->addStateMachineHandlerResolverPlugins($container);
+
         return $container;
     }
 
@@ -86,6 +93,15 @@ class StateMachineDependencyProvider extends AbstractBundleDependencyProvider
         return $container;
     }
 
+    protected function addStateMachineHandlerResolverPlugins(Container $container): Container
+    {
+        $container->set(static::PLUGINS_STATE_MACHINE_HANDLER_RESOLVER, function () {
+            return $this->getStateMachineHandlerResolverPlugins();
+        });
+
+        return $container;
+    }
+
     /**
      * @return \Spryker\Zed\Graph\Communication\Plugin\GraphPlugin
      */
@@ -98,6 +114,14 @@ class StateMachineDependencyProvider extends AbstractBundleDependencyProvider
      * @return array<\Spryker\Zed\StateMachine\Dependency\Plugin\StateMachineHandlerInterface>
      */
     protected function getStateMachineHandlers()
+    {
+        return [];
+    }
+
+    /**
+     * @return array<\Spryker\Zed\StateMachine\Dependency\Plugin\StateMachineHandlerResolverPluginInterface>
+     */
+    protected function getStateMachineHandlerResolverPlugins(): array
     {
         return [];
     }

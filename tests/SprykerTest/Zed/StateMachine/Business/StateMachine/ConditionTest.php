@@ -12,6 +12,7 @@ use Spryker\Zed\StateMachine\Business\Process\State;
 use Spryker\Zed\StateMachine\Business\Process\Transition;
 use Spryker\Zed\StateMachine\Business\StateMachine\Condition;
 use Spryker\Zed\StateMachine\Business\StateMachine\HandlerResolverInterface;
+use Spryker\Zed\StateMachine\Business\StateMachine\ProcessKeyBuilder;
 use SprykerTest\Zed\StateMachine\Mocks\StateMachineMocks;
 
 /**
@@ -37,6 +38,7 @@ class ConditionTest extends StateMachineMocks
             $this->createFinderMock(),
             $this->createPersistenceMock(),
             $this->createStateUpdaterMock(),
+            new ProcessKeyBuilder(),
         );
 
         $transitions = [];
@@ -72,6 +74,7 @@ class ConditionTest extends StateMachineMocks
             $this->createFinderMock(),
             $this->createPersistenceMock(),
             $this->createStateUpdaterMock(),
+            new ProcessKeyBuilder(),
         );
 
         $transitions = [];

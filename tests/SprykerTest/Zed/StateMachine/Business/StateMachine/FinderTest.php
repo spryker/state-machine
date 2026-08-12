@@ -19,6 +19,7 @@ use Spryker\Zed\StateMachine\Business\Process\State;
 use Spryker\Zed\StateMachine\Business\StateMachine\BuilderInterface;
 use Spryker\Zed\StateMachine\Business\StateMachine\Finder;
 use Spryker\Zed\StateMachine\Business\StateMachine\HandlerResolverInterface;
+use Spryker\Zed\StateMachine\Business\StateMachine\ProcessKeyBuilder;
 use Spryker\Zed\StateMachine\Persistence\StateMachineQueryContainerInterface;
 use SprykerTest\Zed\StateMachine\Mocks\StateMachineMocks;
 
@@ -184,6 +185,7 @@ class FinderTest extends StateMachineMocks
             $builderMock,
             $handlerResolverMock,
             $stateMachineQueryContainerMock,
+            new ProcessKeyBuilder(),
         );
     }
 }

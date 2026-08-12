@@ -72,12 +72,11 @@ interface FinderInterface
     );
 
     /**
-     * @param string $stateMachineName
-     * @param string $processName
+     * @param \Generated\Shared\Transfer\StateMachineProcessTransfer $stateMachineProcessTransfer
      *
      * @return \Spryker\Zed\StateMachine\Business\Process\ProcessInterface
      */
-    public function findProcessByStateMachineAndProcessName($stateMachineName, $processName);
+    public function findProcessByStateMachineProcess(StateMachineProcessTransfer $stateMachineProcessTransfer);
 
     /**
      * @param array<\Generated\Shared\Transfer\StateMachineItemTransfer> $stateMachineItems

@@ -18,6 +18,7 @@ use Spryker\Zed\StateMachine\Business\StateMachine\ConditionInterface;
 use Spryker\Zed\StateMachine\Business\StateMachine\FinderInterface;
 use Spryker\Zed\StateMachine\Business\StateMachine\HandlerResolverInterface;
 use Spryker\Zed\StateMachine\Business\StateMachine\PersistenceInterface;
+use Spryker\Zed\StateMachine\Business\StateMachine\ProcessKeyBuilder;
 use Spryker\Zed\StateMachine\Business\StateMachine\StateUpdaterInterface;
 use Spryker\Zed\StateMachine\Business\StateMachine\Trigger;
 use SprykerTest\Zed\StateMachine\Mocks\StateMachineMocks;
@@ -85,7 +86,7 @@ class TriggerTest extends StateMachineMocks
             ->willReturn($this->createProcesses());
 
         $finderMock->expects($this->once())
-            ->method('findProcessByStateMachineAndProcessName')
+            ->method('findProcessByStateMachineProcess')
             ->willReturn($this->createProcesses()[static::PROCESS_NAME]);
 
         $finderMock->expects($this->exactly(2))
@@ -312,6 +313,7 @@ class TriggerTest extends StateMachineMocks
             $persistenceMock,
             $conditionMock,
             $stateUpdaterMock,
+            new ProcessKeyBuilder(),
         );
     }
 
@@ -343,7 +345,7 @@ class TriggerTest extends StateMachineMocks
             ->willReturn($this->createProcesses());
 
         $finderMock->expects($this->once())
-            ->method('findProcessByStateMachineAndProcessName')
+            ->method('findProcessByStateMachineProcess')
             ->willReturn($this->createProcesses()[static::PROCESS_NAME]);
 
         $finderMock->expects($this->once())

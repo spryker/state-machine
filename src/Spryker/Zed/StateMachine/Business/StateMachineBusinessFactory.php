@@ -26,6 +26,8 @@ use Spryker\Zed\StateMachine\Business\StateMachine\Finder;
 use Spryker\Zed\StateMachine\Business\StateMachine\HandlerResolver;
 use Spryker\Zed\StateMachine\Business\StateMachine\LockedTrigger;
 use Spryker\Zed\StateMachine\Business\StateMachine\Persistence;
+use Spryker\Zed\StateMachine\Business\StateMachine\ProcessKeyBuilder;
+use Spryker\Zed\StateMachine\Business\StateMachine\ProcessKeyBuilderInterface;
 use Spryker\Zed\StateMachine\Business\StateMachine\StateUpdater;
 use Spryker\Zed\StateMachine\Business\StateMachine\Timeout;
 use Spryker\Zed\StateMachine\Business\StateMachine\Trigger;
@@ -62,7 +64,13 @@ class StateMachineBusinessFactory extends AbstractBusinessFactory
             $this->createStateMachinePersistence(),
             $this->createStateMachineCondition(),
             $this->createStateUpdater(),
+            $this->createProcessKeyBuilder(),
         );
+    }
+
+    public function createProcessKeyBuilder(): ProcessKeyBuilderInterface
+    {
+        return new ProcessKeyBuilder();
     }
 
     /**
@@ -87,6 +95,7 @@ class StateMachineBusinessFactory extends AbstractBusinessFactory
             $this->createStateMachineFinder(),
             $this->createStateMachinePersistence(),
             $this->createStateUpdater(),
+            $this->createProcessKeyBuilder(),
         );
     }
 
@@ -100,6 +109,7 @@ class StateMachineBusinessFactory extends AbstractBusinessFactory
             $this->createHandlerResolver(),
             $this->createStateMachinePersistence(),
             $this->getQueryContainer(),
+            $this->createProcessKeyBuilder(),
         );
     }
 
@@ -115,6 +125,7 @@ class StateMachineBusinessFactory extends AbstractBusinessFactory
             $this->createProcessProcess(),
             $this->getConfig(),
             $this->createPathResolver(),
+            $this->createHandlerResolver(),
         );
     }
 
@@ -132,6 +143,7 @@ class StateMachineBusinessFactory extends AbstractBusinessFactory
             $this->createStateMachineBuilder(),
             $this->createHandlerResolver(),
             $this->getQueryContainer(),
+            $this->createProcessKeyBuilder(),
         );
     }
 
@@ -230,7 +242,10 @@ class StateMachineBusinessFactory extends AbstractBusinessFactory
      */
     protected function createHandlerResolver()
     {
-        return new HandlerResolver($this->getStateMachineHandlerPlugins());
+        return new HandlerResolver(
+            $this->getStateMachineHandlerPlugins(),
+            $this->getStateMachineHandlerResolverPlugins(),
+        );
     }
 
     /**
@@ -247,6 +262,14 @@ class StateMachineBusinessFactory extends AbstractBusinessFactory
     public function getStateMachineHandlerPlugins()
     {
         return $this->getProvidedDependency(StateMachineDependencyProvider::PLUGINS_STATE_MACHINE_HANDLERS);
+    }
+
+    /**
+     * @return array<\Spryker\Zed\StateMachine\Dependency\Plugin\StateMachineHandlerResolverPluginInterface>
+     */
+    public function getStateMachineHandlerResolverPlugins(): array
+    {
+        return $this->getProvidedDependency(StateMachineDependencyProvider::PLUGINS_STATE_MACHINE_HANDLER_RESOLVER);
     }
 
     /**

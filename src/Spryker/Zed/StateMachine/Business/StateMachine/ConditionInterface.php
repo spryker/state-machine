@@ -8,6 +8,7 @@
 namespace Spryker\Zed\StateMachine\Business\StateMachine;
 
 use Generated\Shared\Transfer\StateMachineItemTransfer;
+use Generated\Shared\Transfer\StateMachineProcessTransfer;
 use Spryker\Zed\StateMachine\Business\Logger\TransitionLogInterface;
 use Spryker\Zed\StateMachine\Business\Process\StateInterface;
 
@@ -31,10 +32,9 @@ interface ConditionInterface
     );
 
     /**
-     * @param string $stateMachineName
-     * @param string $processName
+     * @param \Generated\Shared\Transfer\StateMachineProcessTransfer $stateMachineProcessTransfer
      *
      * @return array<array<\Generated\Shared\Transfer\StateMachineItemTransfer>>
      */
-    public function getOnEnterEventsForStatesWithoutTransition($stateMachineName, $processName);
+    public function getOnEnterEventsForStatesWithoutTransition(StateMachineProcessTransfer $stateMachineProcessTransfer);
 }

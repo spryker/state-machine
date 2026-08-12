@@ -32,14 +32,21 @@ class Finder implements FinderInterface
      */
     protected $queryContainer;
 
+    /**
+     * @var \Spryker\Zed\StateMachine\Business\StateMachine\ProcessKeyBuilderInterface
+     */
+    protected $processKeyBuilder;
+
     public function __construct(
         BuilderInterface $builder,
         HandlerResolverInterface $stateMachineHandlerResolver,
-        StateMachineQueryContainerInterface $queryContainer
+        StateMachineQueryContainerInterface $queryContainer,
+        ProcessKeyBuilderInterface $processKeyBuilder
     ) {
         $this->builder = $builder;
         $this->stateMachineHandlerResolver = $stateMachineHandlerResolver;
         $this->queryContainer = $queryContainer;
+        $this->processKeyBuilder = $processKeyBuilder;
     }
 
     /**
@@ -103,6 +110,7 @@ class Finder implements FinderInterface
         $stateMachineProcessTransfer = $this->createStateMachineProcessTransfer(
             $stateMachineItemTransfer->getStateMachineName(),
             $processName,
+            $stateMachineItemTransfer->getVersion(),
         );
 
         $process = $processBuilder->createProcess($stateMachineProcessTransfer);
@@ -220,11 +228,12 @@ class Finder implements FinderInterface
         $itemsWithOnEnterEvent = [];
         foreach ($stateMachineItems as $stateMachineItemTransfer) {
             $stateName = $stateMachineItemTransfer->requireStateName()->getStateName();
-            $processName = $stateMachineItemTransfer->requireProcessName()->getProcessName();
+            $stateMachineItemTransfer->requireProcessName();
+            $processKey = $this->processKeyBuilder->getProcessKey((string)$stateMachineItemTransfer->getProcessName(), $stateMachineItemTransfer->getVersion());
 
-            $this->assertProcessExists($processes, $processName);
+            $this->assertProcessExists($processes, $processKey);
 
-            $process = $processes[$processName];
+            $process = $processes[$processKey];
             $targetState = $process->getStateFromAllProcesses($stateName);
 
             if (isset($sourceStates[$stateMachineItemTransfer->getIdentifier()])) {
@@ -246,15 +255,12 @@ class Finder implements FinderInterface
     }
 
     /**
-     * @param string $stateMachineName
-     * @param string $processName
+     * @param \Generated\Shared\Transfer\StateMachineProcessTransfer $stateMachineProcessTransfer
      *
      * @return \Spryker\Zed\StateMachine\Business\Process\ProcessInterface
      */
-    public function findProcessByStateMachineAndProcessName($stateMachineName, $processName)
+    public function findProcessByStateMachineProcess(StateMachineProcessTransfer $stateMachineProcessTransfer)
     {
-        $stateMachineProcessTransfer = $this->createStateMachineProcessTransfer($stateMachineName, $processName);
-
         return $this->builder->createProcess($stateMachineProcessTransfer);
     }
 
@@ -267,14 +273,18 @@ class Finder implements FinderInterface
     {
         $processes = [];
         foreach ($stateMachineItems as $stateMachineItemTransfer) {
-            $processName = $stateMachineItemTransfer->requireProcessName()->getProcessName();
-            if (isset($processes[$processName])) {
+            $stateMachineItemTransfer->requireProcessName();
+            $processKey = $this->processKeyBuilder->getProcessKey((string)$stateMachineItemTransfer->getProcessName(), $stateMachineItemTransfer->getVersion());
+            if (isset($processes[$processKey])) {
                 continue;
             }
 
-            $processes[$stateMachineItemTransfer->getProcessName()] = $this->findProcessByStateMachineAndProcessName(
-                $stateMachineItemTransfer->getStateMachineName(),
-                $stateMachineItemTransfer->getProcessName(),
+            $processes[$processKey] = $this->findProcessByStateMachineProcess(
+                $this->createStateMachineProcessTransfer(
+                    $stateMachineItemTransfer->getStateMachineName(),
+                    $stateMachineItemTransfer->getProcessName(),
+                    $stateMachineItemTransfer->getVersion(),
+                ),
             );
         }
 
@@ -306,14 +316,16 @@ class Finder implements FinderInterface
     /**
      * @param string $stateMachineName
      * @param string $processName
+     * @param int|null $version
      *
      * @return \Generated\Shared\Transfer\StateMachineProcessTransfer
      */
-    protected function createStateMachineProcessTransfer($stateMachineName, $processName)
+    protected function createStateMachineProcessTransfer($stateMachineName, $processName, ?int $version = null)
     {
         $stateMachineProcessTransfer = new StateMachineProcessTransfer();
         $stateMachineProcessTransfer->setStateMachineName($stateMachineName);
         $stateMachineProcessTransfer->setProcessName($processName);
+        $stateMachineProcessTransfer->setVersion($version);
 
         return $stateMachineProcessTransfer;
     }

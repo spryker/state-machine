@@ -10,11 +10,13 @@
         <property name="stateName" type="string"/>
         <property name="eventName" type="string"/>
         <property name="createdAt" type="string"/>
+        <property name="version" type="int"/>
     </transfer>
 
     <transfer name="StateMachineProcess">
         <property name="processName" type="string"/>
         <property name="stateMachineName" type="string"/>
+        <property name="version" type="int"/>
     </transfer>
 
     <transfer name="StateMachineItemState">

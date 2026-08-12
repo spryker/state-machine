@@ -13,6 +13,7 @@ use Generated\Shared\Transfer\StateMachineProcessTransfer;
 use Spryker\Zed\StateMachine\Business\Exception\CommandNotFoundException;
 use Spryker\Zed\StateMachine\Business\Exception\TriggerException;
 use Spryker\Zed\StateMachine\Business\Logger\TransitionLogInterface;
+use Spryker\Zed\StateMachine\Dependency\Plugin\PersistentStateMachineHandlerInterface;
 use Spryker\Zed\StateMachine\Dependency\Plugin\StateMachineHandlerInterface;
 
 class Trigger implements TriggerInterface
@@ -62,13 +63,19 @@ class Trigger implements TriggerInterface
      */
     protected $affectedItems = 0;
 
+    /**
+     * @var \Spryker\Zed\StateMachine\Business\StateMachine\ProcessKeyBuilderInterface
+     */
+    protected $processKeyBuilder;
+
     public function __construct(
         TransitionLogInterface $transitionLog,
         HandlerResolverInterface $stateMachineHandlerResolver,
         FinderInterface $finder,
         PersistenceInterface $stateMachinePersistence,
         ConditionInterface $condition,
-        StateUpdaterInterface $stateUpdater
+        StateUpdaterInterface $stateUpdater,
+        ProcessKeyBuilderInterface $processKeyBuilder
     ) {
         $this->transitionLog = $transitionLog;
         $this->stateMachineHandlerResolver = $stateMachineHandlerResolver;
@@ -76,6 +83,7 @@ class Trigger implements TriggerInterface
         $this->stateMachinePersistence = $stateMachinePersistence;
         $this->condition = $condition;
         $this->stateUpdater = $stateUpdater;
+        $this->processKeyBuilder = $processKeyBuilder;
     }
 
     /**
@@ -156,15 +164,33 @@ class Trigger implements TriggerInterface
     public function triggerConditionsWithoutEvent($stateMachineName)
     {
         $stateMachineHandler = $this->stateMachineHandlerResolver->get($stateMachineName);
-        foreach ($stateMachineHandler->getActiveProcesses() as $processName) {
+        foreach ($this->getProcessesToCheckConditions($stateMachineHandler) as $stateMachineProcessTransfer) {
             $stateMachineItemsWithOnEnterEvent = $this->condition->getOnEnterEventsForStatesWithoutTransition(
-                $stateMachineName,
-                $processName,
+                $stateMachineProcessTransfer,
             );
             $this->triggerOnEnterEvents($stateMachineItemsWithOnEnterEvent);
         }
 
         return $this->affectedItems;
+    }
+
+    /**
+     * @return array<\Generated\Shared\Transfer\StateMachineProcessTransfer>
+     */
+    protected function getProcessesToCheckConditions(StateMachineHandlerInterface $stateMachineHandler): array
+    {
+        if ($stateMachineHandler instanceof PersistentStateMachineHandlerInterface) {
+            return $stateMachineHandler->getProcessesForConditionCheck();
+        }
+
+        $stateMachineProcessTransfers = [];
+        foreach ($stateMachineHandler->getActiveProcesses() as $processName) {
+            $stateMachineProcessTransfers[] = (new StateMachineProcessTransfer())
+                ->setStateMachineName($stateMachineHandler->getStateMachineName())
+                ->setProcessName($processName);
+        }
+
+        return $stateMachineProcessTransfers;
     }
 
     /**
@@ -175,6 +201,11 @@ class Trigger implements TriggerInterface
     public function triggerForTimeoutExpiredItems($stateMachineName)
     {
         $stateMachineItems = $this->stateMachinePersistence->getItemsWithExpiredTimeouts($stateMachineName);
+
+        $stateMachineHandler = $this->stateMachineHandlerResolver->get($stateMachineName);
+        if ($stateMachineHandler instanceof PersistentStateMachineHandlerInterface) {
+            $stateMachineItems = $stateMachineHandler->expandTimeoutItemsWithVersion($stateMachineItems);
+        }
 
         $groupedStateMachineItems = $this->groupItemsByEvent($stateMachineItems);
         foreach ($groupedStateMachineItems as $event => $stateMachineItems) {
@@ -215,12 +246,13 @@ class Trigger implements TriggerInterface
         $stateMachineItemsFiltered = [];
         foreach ($stateMachineItems as $stateMachineItemTransfer) {
             $stateName = $stateMachineItemTransfer->requireStateName()->getStateName();
-            $processName = $stateMachineItemTransfer->requireProcessName()->getProcessName();
-            if (!isset($processes[$processName])) {
+            $stateMachineItemTransfer->requireProcessName();
+            $processKey = $this->processKeyBuilder->getProcessKey((string)$stateMachineItemTransfer->getProcessName(), $stateMachineItemTransfer->getVersion());
+            if (!isset($processes[$processKey])) {
                 continue;
             }
 
-            $process = $processes[$processName];
+            $process = $processes[$processKey];
             $state = $process->getStateFromAllProcesses($stateName);
             if ($state->hasEvent($eventName)) {
                 $stateMachineItemsFiltered[] = $stateMachineItemTransfer;
@@ -243,12 +275,13 @@ class Trigger implements TriggerInterface
     {
         foreach ($stateMachineItems as $stateMachineItemTransfer) {
             $stateName = $stateMachineItemTransfer->requireStateName()->getStateName();
-            $processName = $stateMachineItemTransfer->requireProcessName()->getProcessName();
-            if (!isset($processes[$processName])) {
+            $stateMachineItemTransfer->requireProcessName();
+            $processKey = $this->processKeyBuilder->getProcessKey((string)$stateMachineItemTransfer->getProcessName(), $stateMachineItemTransfer->getVersion());
+            if (!isset($processes[$processKey])) {
                 continue;
             }
 
-            $process = $processes[$processName];
+            $process = $processes[$processKey];
             $state = $process->getStateFromAllProcesses($stateName);
             $event = $state->getEvent($eventName);
 
@@ -286,9 +319,11 @@ class Trigger implements TriggerInterface
             $stateName = $stateMachineItemTransfer->requireStateName()->getStateName();
             $sourceStateBuffer[$stateMachineItemTransfer->getIdentifier()] = $stateName;
 
-            $process = $this->finder->findProcessByStateMachineAndProcessName(
-                $stateMachineItemTransfer->getStateMachineName(),
-                $stateMachineItemTransfer->getProcessName(),
+            $process = $this->finder->findProcessByStateMachineProcess(
+                (new StateMachineProcessTransfer())
+                    ->setStateMachineName($stateMachineItemTransfer->getStateMachineName())
+                    ->setProcessName($stateMachineItemTransfer->getProcessName())
+                    ->setVersion($stateMachineItemTransfer->getVersion()),
             );
 
             $sourceState = $process->getStateFromAllProcesses($stateName);
@@ -399,6 +434,7 @@ class Trigger implements TriggerInterface
         $stateMachineItemTransfer = new StateMachineItemTransfer();
         $stateMachineItemTransfer->setProcessName($processName);
         $stateMachineItemTransfer->setIdentifier($identifier);
+        $stateMachineItemTransfer->setVersion($stateMachineProcessTransfer->getVersion());
 
         $idStateMachineProcess = $this->stateMachinePersistence
             ->getProcessId($stateMachineProcessTransfer);
@@ -407,9 +443,12 @@ class Trigger implements TriggerInterface
 
         $stateMachineItemTransfer->setIdStateMachineProcess($idStateMachineProcess);
 
-        $initialStateName = $this->stateMachineHandlerResolver
-            ->get($stateMachineProcessTransfer->getStateMachineName())
-            ->getInitialStateForProcess($processName);
+        $stateMachineHandler = $this->stateMachineHandlerResolver
+            ->get($stateMachineProcessTransfer->getStateMachineName());
+
+        $initialStateName = $stateMachineHandler instanceof PersistentStateMachineHandlerInterface
+            ? $stateMachineHandler->getInitialStateForPersistentProcess($stateMachineProcessTransfer)
+            : $stateMachineHandler->getInitialStateForProcess($processName);
 
         $this->assertInitialStateNameProvided($initialStateName, $processName);
         $stateMachineItemTransfer->setStateName($initialStateName);

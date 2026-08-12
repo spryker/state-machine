@@ -9,10 +9,12 @@ namespace Spryker\Zed\StateMachine\Business\StateMachine;
 
 use Exception;
 use Generated\Shared\Transfer\StateMachineItemTransfer;
+use Generated\Shared\Transfer\StateMachineProcessTransfer;
 use Spryker\Zed\StateMachine\Business\Exception\ConditionNotFoundException;
 use Spryker\Zed\StateMachine\Business\Logger\TransitionLogInterface;
 use Spryker\Zed\StateMachine\Business\Process\ProcessInterface;
 use Spryker\Zed\StateMachine\Business\Process\StateInterface;
+use Spryker\Zed\StateMachine\Dependency\Plugin\PersistentStateMachineHandlerInterface;
 use Spryker\Zed\StateMachine\Dependency\Plugin\StateMachineHandlerInterface;
 
 class Condition implements ConditionInterface
@@ -52,18 +54,25 @@ class Condition implements ConditionInterface
      */
     protected $stateUpdater;
 
+    /**
+     * @var \Spryker\Zed\StateMachine\Business\StateMachine\ProcessKeyBuilderInterface
+     */
+    protected $processKeyBuilder;
+
     public function __construct(
         TransitionLogInterface $transitionLog,
         HandlerResolverInterface $stateMachineHandlerResolver,
         FinderInterface $finder,
         PersistenceInterface $stateMachinePersistence,
-        StateUpdaterInterface $stateUpdate
+        StateUpdaterInterface $stateUpdate,
+        ProcessKeyBuilderInterface $processKeyBuilder
     ) {
         $this->transitionLog = $transitionLog;
         $this->stateMachineHandlerResolver = $stateMachineHandlerResolver;
         $this->finder = $finder;
         $this->stateMachinePersistence = $stateMachinePersistence;
         $this->stateUpdater = $stateUpdate;
+        $this->processKeyBuilder = $processKeyBuilder;
     }
 
     /**
@@ -156,26 +165,26 @@ class Condition implements ConditionInterface
     }
 
     /**
-     * @param string $stateMachineName
-     * @param string $processName
+     * @param \Generated\Shared\Transfer\StateMachineProcessTransfer $stateMachineProcessTransfer
      *
      * @return array<array<\Generated\Shared\Transfer\StateMachineItemTransfer>>
      */
-    public function getOnEnterEventsForStatesWithoutTransition($stateMachineName, $processName)
+    public function getOnEnterEventsForStatesWithoutTransition(StateMachineProcessTransfer $stateMachineProcessTransfer)
     {
-        $process = $this->finder->findProcessByStateMachineAndProcessName($stateMachineName, $processName);
+        $stateMachineName = $stateMachineProcessTransfer->getStateMachineNameOrFail();
+        $process = $this->finder->findProcessByStateMachineProcess($stateMachineProcessTransfer);
         $transitions = $process->getAllTransitionsWithoutEvent();
 
         $stateToTransitionsMap = $this->createStateToTransitionMap($transitions);
 
-        $stateMachineItems = $this->getItemsByStatesAndProcessName($stateMachineName, $stateToTransitionsMap, $process);
+        $stateMachineItems = $this->getItemsByStatesAndProcessName($stateMachineProcessTransfer, $stateToTransitionsMap, $process);
 
         $this->transitionLog->init($stateMachineItems);
         $sourceStates = $this->createStateMap($stateMachineItems);
 
         $this->persistAffectedStates($stateMachineName, $stateToTransitionsMap, $stateMachineItems);
 
-        $processes = [$process->getName() => $process];
+        $processes = [$this->processKeyBuilder->getProcessKey($process->getName(), $stateMachineProcessTransfer->getVersion()) => $process];
 
         $this->stateUpdater->updateStateMachineItemState(
             $stateMachineItems,
@@ -193,31 +202,33 @@ class Condition implements ConditionInterface
     }
 
     /**
-     * @param string $stateMachineName
+     * @param \Generated\Shared\Transfer\StateMachineProcessTransfer $stateMachineProcessTransfer
      * @param array<array<\Spryker\Zed\StateMachine\Business\Process\TransitionInterface>> $stateToTransitionsMap
      * @param \Spryker\Zed\StateMachine\Business\Process\ProcessInterface $process
      *
      * @return array<\Generated\Shared\Transfer\StateMachineItemTransfer>
      */
     protected function getItemsByStatesAndProcessName(
-        $stateMachineName,
+        StateMachineProcessTransfer $stateMachineProcessTransfer,
         array $stateToTransitionsMap,
         ProcessInterface $process
     ) {
+        $stateMachineName = $stateMachineProcessTransfer->getStateMachineNameOrFail();
         $stateMachineItemStateIds = $this->stateMachinePersistence->getStateMachineItemIdsByStatesProcessAndStateMachineName(
             $process->getName(),
             $stateMachineName,
             array_keys($stateToTransitionsMap),
         );
 
-        $stateMachineItems = $this->stateMachineHandlerResolver
-            ->get($stateMachineName)
-            ->getStateMachineItemsByStateIds($stateMachineItemStateIds);
+        $stateMachineHandler = $this->stateMachineHandlerResolver->get($stateMachineName);
 
-        $stateMachineItems = $this->stateMachinePersistence
-            ->updateStateMachineItemsFromPersistence($stateMachineItems);
+        if ($stateMachineHandler instanceof PersistentStateMachineHandlerInterface) {
+            return $stateMachineHandler->getStateMachineItemsForPersistentProcessByStateIds($stateMachineProcessTransfer, $stateMachineItemStateIds);
+        }
 
-        return $stateMachineItems;
+        $stateMachineItems = $stateMachineHandler->getStateMachineItemsByStateIds($stateMachineItemStateIds);
+
+        return $this->stateMachinePersistence->updateStateMachineItemsFromPersistence($stateMachineItems);
     }
 
     /**
@@ -236,9 +247,11 @@ class Condition implements ConditionInterface
         foreach ($stateMachineItems as $i => $stateMachineItemTransfer) {
             $stateName = $stateMachineItemTransfer->getStateName();
 
-            $process = $this->finder->findProcessByStateMachineAndProcessName(
-                $stateMachineName,
-                $stateMachineItemTransfer->getProcessName(),
+            $process = $this->finder->findProcessByStateMachineProcess(
+                (new StateMachineProcessTransfer())
+                    ->setStateMachineName($stateMachineName)
+                    ->setProcessName($stateMachineItemTransfer->getProcessName())
+                    ->setVersion($stateMachineItemTransfer->getVersion()),
             );
 
             $sourceState = $process->getStateFromAllProcesses($stateName);

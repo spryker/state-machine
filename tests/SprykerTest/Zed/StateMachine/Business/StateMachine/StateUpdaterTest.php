@@ -13,6 +13,7 @@ use Propel\Runtime\Connection\ConnectionInterface;
 use Spryker\Zed\StateMachine\Business\Process\Process;
 use Spryker\Zed\StateMachine\Business\StateMachine\HandlerResolverInterface;
 use Spryker\Zed\StateMachine\Business\StateMachine\PersistenceInterface;
+use Spryker\Zed\StateMachine\Business\StateMachine\ProcessKeyBuilder;
 use Spryker\Zed\StateMachine\Business\StateMachine\StateUpdater;
 use Spryker\Zed\StateMachine\Business\StateMachine\TimeoutInterface;
 use Spryker\Zed\StateMachine\Persistence\StateMachineQueryContainerInterface;
@@ -197,6 +198,7 @@ class StateUpdaterTest extends StateMachineMocks
             $handlerResolverMock,
             $stateMachinePersistenceMock,
             $queryContainerMock,
+            new ProcessKeyBuilder(),
         );
     }
 

@@ -17,11 +17,18 @@ class HandlerResolver implements HandlerResolverInterface
     protected $handlers = [];
 
     /**
-     * @param array<\Spryker\Zed\StateMachine\Dependency\Plugin\StateMachineHandlerInterface> $handlers
+     * @var array<\Spryker\Zed\StateMachine\Dependency\Plugin\StateMachineHandlerResolverPluginInterface>
      */
-    public function __construct(array $handlers)
+    protected array $stateMachineHandlerResolverPlugins = [];
+
+    /**
+     * @param array<\Spryker\Zed\StateMachine\Dependency\Plugin\StateMachineHandlerInterface> $handlers
+     * @param array<\Spryker\Zed\StateMachine\Dependency\Plugin\StateMachineHandlerResolverPluginInterface> $stateMachineHandlerResolverPlugins
+     */
+    public function __construct(array $handlers, array $stateMachineHandlerResolverPlugins = [])
     {
         $this->handlers = $handlers;
+        $this->stateMachineHandlerResolverPlugins = $stateMachineHandlerResolverPlugins;
     }
 
     /**
@@ -55,6 +62,13 @@ class HandlerResolver implements HandlerResolverInterface
     {
         foreach ($this->handlers as $handler) {
             if ($handler->getStateMachineName() === $stateMachineName) {
+                return $handler;
+            }
+        }
+
+        foreach ($this->stateMachineHandlerResolverPlugins as $stateMachineHandlerResolverPlugin) {
+            $handler = $stateMachineHandlerResolverPlugin->resolveStateMachineHandler($stateMachineName);
+            if ($handler !== null) {
                 return $handler;
             }
         }

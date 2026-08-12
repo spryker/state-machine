@@ -49,6 +49,11 @@ class GraphController extends AbstractController
     /**
      * @var string
      */
+    public const URL_PARAM_VERSION = 'version';
+
+    /**
+     * @var string
+     */
     public const URL_STATE_MACHINE_LIST = '/state-machine/list';
 
     /**
@@ -72,6 +77,7 @@ class GraphController extends AbstractController
         $fontSize = $request->query->getInt(static::URL_PARAM_FONT_SIZE);
         $highlightState = $this->getSanitizedHighlightState($request);
         $stateMachine = (string)$request->query->get(static::URL_PARAM_STATE_MACHINE);
+        $version = $request->query->has(static::URL_PARAM_VERSION) ? $request->query->getInt(static::URL_PARAM_VERSION) : null;
 
         $reload = false;
         $stateMachineBundleConfig = $this->getFactory()->getConfig();
@@ -94,6 +100,7 @@ class GraphController extends AbstractController
                         static::URL_PARAM_FONT_SIZE => $fontSize,
                         static::URL_PARAM_HIGHLIGHT_STATE => $highlightState,
                         static::URL_PARAM_STATE_MACHINE => $stateMachine,
+                        static::URL_PARAM_VERSION => $version,
                     ],
                 )->build(),
             );
@@ -108,6 +115,7 @@ class GraphController extends AbstractController
         $stateMachineProcessTransfer = new StateMachineProcessTransfer();
         $stateMachineProcessTransfer->setStateMachineName($stateMachine);
         $stateMachineProcessTransfer->setProcessName($processName);
+        $stateMachineProcessTransfer->setVersion($version);
 
         $response = $this->getFacade()->drawProcess($stateMachineProcessTransfer, $highlightState, $format, $fontSize);
 

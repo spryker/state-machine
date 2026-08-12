@@ -16,6 +16,7 @@ use Spryker\Zed\StateMachine\Business\Process\State;
 use Spryker\Zed\StateMachine\Business\Process\Transition;
 use Spryker\Zed\StateMachine\Business\Resolver\PathResolver;
 use Spryker\Zed\StateMachine\Business\StateMachine\Builder;
+use Spryker\Zed\StateMachine\Business\StateMachine\HandlerResolver;
 use Spryker\Zed\StateMachine\StateMachineConfig;
 
 /**
@@ -129,6 +130,7 @@ class BuilderTest extends Unit
             $this->createProcess(),
             $config,
             new PathResolver($config),
+            new HandlerResolver([]),
         );
     }
 
