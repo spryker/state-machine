@@ -11,6 +11,7 @@ use Generated\Shared\Transfer\StateMachineItemTransfer;
 use Orm\Zed\StateMachine\Persistence\SpyStateMachineTransitionLog;
 use Spryker\Service\UtilNetwork\UtilNetworkServiceInterface;
 use Spryker\Zed\StateMachine\Business\Process\EventInterface;
+use Spryker\Zed\StateMachine\Dependency\Plugin\CommandByItemsPluginInterface;
 use Spryker\Zed\StateMachine\Dependency\Plugin\CommandPluginInterface;
 use Spryker\Zed\StateMachine\Dependency\Plugin\ConditionPluginInterface;
 
@@ -80,6 +81,19 @@ class TransitionLog implements TransitionLogInterface
     public function addCommand(StateMachineItemTransfer $stateMachineItemTransfer, CommandPluginInterface $command)
     {
         $this->logEntities[$stateMachineItemTransfer->getIdentifier()]->setCommand(get_class($command));
+    }
+
+    /**
+     * @param array<\Generated\Shared\Transfer\StateMachineItemTransfer> $stateMachineItemTransfers
+     * @param \Spryker\Zed\StateMachine\Dependency\Plugin\CommandByItemsPluginInterface $command
+     *
+     * @return void
+     */
+    public function addCommandByItems(array $stateMachineItemTransfers, CommandByItemsPluginInterface $command)
+    {
+        foreach ($stateMachineItemTransfers as $stateMachineItemTransfer) {
+            $this->logEntities[$stateMachineItemTransfer->getIdentifier()]->setCommand(get_class($command));
+        }
     }
 
     /**

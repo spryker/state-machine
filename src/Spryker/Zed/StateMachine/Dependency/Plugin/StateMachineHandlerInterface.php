@@ -22,7 +22,7 @@ interface StateMachineHandlerInterface
      *
      * @api
      *
-     * @return array<\Spryker\Zed\StateMachine\Dependency\Plugin\CommandPluginInterface>
+     * @return array<\Spryker\Zed\StateMachine\Dependency\Plugin\CommandPluginInterface|\Spryker\Zed\StateMachine\Dependency\Plugin\CommandByItemsPluginInterface>
      */
     public function getCommandPlugins();
 

@@ -9,6 +9,7 @@ namespace Spryker\Zed\StateMachine\Business\Logger;
 
 use Generated\Shared\Transfer\StateMachineItemTransfer;
 use Spryker\Zed\StateMachine\Business\Process\EventInterface;
+use Spryker\Zed\StateMachine\Dependency\Plugin\CommandByItemsPluginInterface;
 use Spryker\Zed\StateMachine\Dependency\Plugin\CommandPluginInterface;
 use Spryker\Zed\StateMachine\Dependency\Plugin\ConditionPluginInterface;
 
@@ -35,6 +36,14 @@ interface TransitionLogInterface
      * @return void
      */
     public function addCommand(StateMachineItemTransfer $stateMachineItemTransfer, CommandPluginInterface $command);
+
+    /**
+     * @param array<\Generated\Shared\Transfer\StateMachineItemTransfer> $stateMachineItemTransfers
+     * @param \Spryker\Zed\StateMachine\Dependency\Plugin\CommandByItemsPluginInterface $command
+     *
+     * @return void
+     */
+    public function addCommandByItems(array $stateMachineItemTransfers, CommandByItemsPluginInterface $command);
 
     /**
      * @param \Generated\Shared\Transfer\StateMachineItemTransfer $stateMachineItemTransfer

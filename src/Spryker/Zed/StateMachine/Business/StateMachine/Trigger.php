@@ -10,9 +10,13 @@ namespace Spryker\Zed\StateMachine\Business\StateMachine;
 use Exception;
 use Generated\Shared\Transfer\StateMachineItemTransfer;
 use Generated\Shared\Transfer\StateMachineProcessTransfer;
+use LogicException;
+use SplObjectStorage;
 use Spryker\Zed\StateMachine\Business\Exception\CommandNotFoundException;
 use Spryker\Zed\StateMachine\Business\Exception\TriggerException;
 use Spryker\Zed\StateMachine\Business\Logger\TransitionLogInterface;
+use Spryker\Zed\StateMachine\Dependency\Plugin\CommandByItemsPluginInterface;
+use Spryker\Zed\StateMachine\Dependency\Plugin\CommandPluginInterface;
 use Spryker\Zed\StateMachine\Dependency\Plugin\PersistentStateMachineHandlerInterface;
 use Spryker\Zed\StateMachine\Dependency\Plugin\StateMachineHandlerInterface;
 
@@ -267,41 +271,91 @@ class Trigger implements TriggerInterface
      * @param array<\Generated\Shared\Transfer\StateMachineItemTransfer> $stateMachineItems
      * @param array<\Spryker\Zed\StateMachine\Business\Process\ProcessInterface> $processes
      *
-     * @throws \Exception
-     *
      * @return void
      */
     protected function runCommand($eventName, array $stateMachineItems, array $processes)
     {
+        $stateMachineItemsByCommandPlugin = new SplObjectStorage();
+
         foreach ($stateMachineItems as $stateMachineItemTransfer) {
-            $stateName = $stateMachineItemTransfer->requireStateName()->getStateName();
-            $stateMachineItemTransfer->requireProcessName();
-            $processKey = $this->processKeyBuilder->getProcessKey((string)$stateMachineItemTransfer->getProcessName(), $stateMachineItemTransfer->getVersion());
-            if (!isset($processes[$processKey])) {
+            $commandPlugin = $this->findCommandPlugin($eventName, $stateMachineItemTransfer, $processes);
+
+            if (!$commandPlugin) {
                 continue;
             }
 
-            $process = $processes[$processKey];
-            $state = $process->getStateFromAllProcesses($stateName);
-            $event = $state->getEvent($eventName);
+            $stateMachineItemsByCommandPlugin[$commandPlugin] = [
+                ...$stateMachineItemsByCommandPlugin[$commandPlugin] ?? [],
+                $stateMachineItemTransfer,
+            ];
+        }
 
-            if (!$event->hasCommand()) {
-                continue;
+        foreach ($stateMachineItemsByCommandPlugin as $commandPlugin) {
+            $this->executeCommandPlugin($commandPlugin, $stateMachineItemsByCommandPlugin[$commandPlugin]);
+        }
+    }
+
+    /**
+     * @param string $eventName
+     * @param \Generated\Shared\Transfer\StateMachineItemTransfer $stateMachineItemTransfer
+     * @param array<\Spryker\Zed\StateMachine\Business\Process\ProcessInterface> $processes
+     *
+     * @return \Spryker\Zed\StateMachine\Dependency\Plugin\CommandByItemsPluginInterface|\Spryker\Zed\StateMachine\Dependency\Plugin\CommandPluginInterface|null
+     */
+    protected function findCommandPlugin($eventName, StateMachineItemTransfer $stateMachineItemTransfer, array $processes)
+    {
+        $stateName = $stateMachineItemTransfer->requireStateName()->getStateName();
+        $stateMachineItemTransfer->requireProcessName();
+        $processKey = $this->processKeyBuilder->getProcessKey((string)$stateMachineItemTransfer->getProcessName(), $stateMachineItemTransfer->getVersion());
+
+        if (!isset($processes[$processKey])) {
+            return null;
+        }
+
+        $event = $processes[$processKey]->getStateFromAllProcesses($stateName)->getEvent($eventName);
+
+        if (!$event->hasCommand()) {
+            return null;
+        }
+
+        return $this->getCommand($event->getCommand(), $stateMachineItemTransfer->getStateMachineName());
+    }
+
+    /**
+     * @param object $commandPlugin
+     * @param array<\Generated\Shared\Transfer\StateMachineItemTransfer> $stateMachineItemTransfers
+     *
+     * @throws \LogicException
+     * @throws \Exception
+     *
+     * @return void
+     */
+    protected function executeCommandPlugin(object $commandPlugin, array $stateMachineItemTransfers)
+    {
+        try {
+            if ($commandPlugin instanceof CommandByItemsPluginInterface) {
+                $this->transitionLog->addCommandByItems($stateMachineItemTransfers, $commandPlugin);
+
+                $commandPlugin->run($stateMachineItemTransfers);
+
+                return;
             }
 
-            $commandPlugin = $this->getCommand($event->getCommand(), $stateMachineItemTransfer->getStateMachineName());
+            if (!$commandPlugin instanceof CommandPluginInterface) {
+                throw new LogicException('Unknown type of command: ' . get_class($commandPlugin));
+            }
 
-            $this->transitionLog->addCommand($stateMachineItemTransfer, $commandPlugin);
+            foreach ($stateMachineItemTransfers as $stateMachineItemTransfer) {
+                $this->transitionLog->addCommand($stateMachineItemTransfer, $commandPlugin);
 
-            try {
                 $commandPlugin->run($stateMachineItemTransfer);
-            } catch (Exception $e) {
-                $this->transitionLog->setIsError(true);
-                $this->transitionLog->setErrorMessage(get_class($commandPlugin) . ' - ' . $e->getMessage());
-                $this->transitionLog->saveAll();
-
-                throw $e;
             }
+        } catch (Exception $e) {
+            $this->transitionLog->setIsError(true);
+            $this->transitionLog->setErrorMessage(get_class($commandPlugin) . ' - ' . $e->getMessage());
+            $this->transitionLog->saveAll();
+
+            throw $e;
         }
     }
 
@@ -394,7 +448,7 @@ class Trigger implements TriggerInterface
      * @param string $commandString
      * @param string $stateMachineName
      *
-     * @return \Spryker\Zed\StateMachine\Dependency\Plugin\CommandPluginInterface
+     * @return \Spryker\Zed\StateMachine\Dependency\Plugin\CommandByItemsPluginInterface|\Spryker\Zed\StateMachine\Dependency\Plugin\CommandPluginInterface
      */
     protected function getCommand($commandString, $stateMachineName)
     {

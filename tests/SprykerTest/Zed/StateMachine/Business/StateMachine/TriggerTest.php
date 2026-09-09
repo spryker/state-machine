@@ -9,6 +9,7 @@ namespace SprykerTest\Zed\StateMachine\Business\StateMachine;
 
 use Generated\Shared\Transfer\StateMachineItemTransfer;
 use Generated\Shared\Transfer\StateMachineProcessTransfer;
+use LogicException;
 use Spryker\Zed\StateMachine\Business\Logger\TransitionLogInterface;
 use Spryker\Zed\StateMachine\Business\Process\Event;
 use Spryker\Zed\StateMachine\Business\Process\Process;
@@ -21,7 +22,10 @@ use Spryker\Zed\StateMachine\Business\StateMachine\PersistenceInterface;
 use Spryker\Zed\StateMachine\Business\StateMachine\ProcessKeyBuilder;
 use Spryker\Zed\StateMachine\Business\StateMachine\StateUpdaterInterface;
 use Spryker\Zed\StateMachine\Business\StateMachine\Trigger;
+use Spryker\Zed\StateMachine\Dependency\Plugin\CommandByItemsPluginInterface;
+use Spryker\Zed\StateMachine\Dependency\Plugin\CommandPluginInterface;
 use SprykerTest\Zed\StateMachine\Mocks\StateMachineMocks;
+use stdClass;
 
 /**
  * Auto-generated group annotations
@@ -60,6 +64,16 @@ class TriggerTest extends StateMachineMocks
      * @var string
      */
     public const TEST_COMMAND = 'TestCommand';
+
+    /**
+     * @var string
+     */
+    protected const OTHER_TEST_COMMAND = 'OtherTestCommand';
+
+    /**
+     * @var string
+     */
+    protected const OTHER_STATE_NAME = 'other';
 
     public function testTriggerForNewItemShouldExecutedSMAndPersistNewItem(): void
     {
@@ -140,6 +154,202 @@ class TriggerTest extends StateMachineMocks
         );
 
         $this->assertSame(1, $affectedItems);
+    }
+
+    public function testTriggerEventRunsCommandByItemsPluginOnceForAllStateMachineItems(): void
+    {
+        // Arrange
+        $stateMachineItemTransfers = [
+            $this->createTriggerStateMachineItem(),
+            $this->createTriggerStateMachineItem()->setIdentifier(2),
+        ];
+
+        $commandByItemsPluginMock = $this->getMockBuilder(CommandByItemsPluginInterface::class)->getMock();
+
+        $commandByItemsPluginMock->expects($this->once())
+            ->method('run')
+            ->with($stateMachineItemTransfers);
+
+        $trigger = $this->createTriggerWithCommandPlugin($commandByItemsPluginMock);
+
+        // Act
+        $affectedItems = $trigger->triggerEvent('event', $stateMachineItemTransfers);
+
+        // Assert
+        $this->assertSame(2, $affectedItems);
+    }
+
+    public function testTriggerEventRunsCommandPluginPerStateMachineItem(): void
+    {
+        // Arrange
+        $stateMachineItemTransfers = [
+            $this->createTriggerStateMachineItem(),
+            $this->createTriggerStateMachineItem()->setIdentifier(2),
+        ];
+
+        $commandPluginMock = $this->getMockBuilder(CommandPluginInterface::class)->getMock();
+
+        $commandPluginMock->expects($this->exactly(2))->method('run');
+
+        $trigger = $this->createTriggerWithCommandPlugin($commandPluginMock);
+
+        // Act
+        $affectedItems = $trigger->triggerEvent('event', $stateMachineItemTransfers);
+
+        // Assert
+        $this->assertSame(2, $affectedItems);
+    }
+
+    /**
+     * @param \Spryker\Zed\StateMachine\Dependency\Plugin\CommandPluginInterface|\Spryker\Zed\StateMachine\Dependency\Plugin\CommandByItemsPluginInterface $commandPlugin
+     * @param array<\Spryker\Zed\StateMachine\Business\Process\ProcessInterface>|null $processes
+     */
+    protected function createTriggerWithCommandPlugin(
+        object $commandPlugin,
+        ?array $processes = null,
+        ?TransitionLogInterface $transitionLogMock = null
+    ): Trigger {
+        return $this->createTriggerWithCommandPlugins(
+            [static::TEST_COMMAND => $commandPlugin],
+            $processes,
+            $transitionLogMock,
+        );
+    }
+
+    /**
+     * @param array<string, object> $commandPlugins
+     * @param array<\Spryker\Zed\StateMachine\Business\Process\ProcessInterface>|null $processes
+     */
+    protected function createTriggerWithCommandPlugins(
+        array $commandPlugins,
+        ?array $processes = null,
+        ?TransitionLogInterface $transitionLogMock = null
+    ): Trigger {
+        $processes = $processes ?? $this->createProcesses();
+        $finderMock = $this->createFinderMock();
+        $finderMock->method('findProcessesForItems')->willReturn($processes);
+        $finderMock->method('findProcessByStateMachineProcess')->willReturn($processes[static::PROCESS_NAME]);
+        $finderMock->method('filterItemsWithOnEnterEvent')->willReturn([]);
+
+        $persistenceMock = $this->createPersistenceMock();
+        $persistenceMock->method('updateStateMachineItemsFromPersistence')->willReturnCallback(
+            function (array $stateMachineItemTransfers): array {
+                return $stateMachineItemTransfers;
+            },
+        );
+
+        $targetState = new State();
+        $targetState->setName('target state');
+        $conditionMock = $this->createConditionMock();
+        $conditionMock->method('getTargetStatesFromTransitions')->willReturn($targetState);
+
+        $handlerResolverMock = $this->createHandlerResolverMock();
+        $handlerMock = $this->createStateMachineHandlerMock();
+        $handlerMock->method('getActiveProcesses')->willReturn([static::PROCESS_NAME]);
+        $handlerMock->method('getInitialStateForProcess')->willReturn(static::INITIAL_STATE);
+        $handlerMock->method('getCommandPlugins')->willReturn($commandPlugins);
+        $handlerResolverMock->method('get')->willReturn($handlerMock);
+
+        return $this->createTrigger(
+            $transitionLogMock ?? $this->createTransitionLogMock(),
+            $finderMock,
+            $persistenceMock,
+            $conditionMock,
+            null,
+            $handlerResolverMock,
+        );
+    }
+
+    /**
+     * A process whose two states resolve the same event to two different commands.
+     *
+     * @return array<\Spryker\Zed\StateMachine\Business\Process\ProcessInterface>
+     */
+    protected function createProcessesWithTwoStates(): array
+    {
+        $process = new Process();
+
+        foreach ([static::INITIAL_STATE => static::TEST_COMMAND, static::OTHER_STATE_NAME => static::OTHER_TEST_COMMAND] as $stateName => $commandName) {
+            $event = new Event();
+            $event->setName('event');
+            $event->setCommand($commandName);
+
+            $sourceState = new State();
+            $sourceState->setName($stateName);
+
+            $transition = new Transition();
+            $transition->setSourceState($sourceState);
+            $event->addTransition($transition);
+
+            $outgoingTransition = new Transition();
+            $outgoingTransition->setEvent($event);
+
+            $state = new State();
+            $state->setName($stateName);
+            $state->addOutgoingTransition($outgoingTransition);
+
+            $process->addState($state);
+        }
+
+        return [static::PROCESS_NAME => $process];
+    }
+
+    /**
+     * Items of one event can sit in states resolving to different commands. Each command must receive its
+     * own items only, and none of them may be skipped.
+     */
+    public function testTriggerEventRunsEachCommandWithItsOwnStateMachineItemsOnly(): void
+    {
+        // Arrange
+        $itemOfCommandByItems = $this->createTriggerStateMachineItem();
+        $itemOfCommandPlugin = $this->createTriggerStateMachineItem()->setIdentifier(2)->setStateName(static::OTHER_STATE_NAME);
+
+        $commandByItemsPluginMock = $this->getMockBuilder(CommandByItemsPluginInterface::class)->getMock();
+        $commandByItemsPluginMock->expects($this->once())
+            ->method('run')
+            ->with([$itemOfCommandByItems]);
+
+        $commandPluginMock = $this->getMockBuilder(CommandPluginInterface::class)->getMock();
+        $commandPluginMock->expects($this->once())
+            ->method('run')
+            ->with($itemOfCommandPlugin);
+
+        $trigger = $this->createTriggerWithCommandPlugins([
+            static::TEST_COMMAND => $commandByItemsPluginMock,
+            static::OTHER_TEST_COMMAND => $commandPluginMock,
+        ], $this->createProcessesWithTwoStates());
+
+        // Act
+        $trigger->triggerEvent('event', [$itemOfCommandByItems, $itemOfCommandPlugin]);
+    }
+
+    public function testTriggerEventThrowsExceptionWhenCommandImplementsNoKnownInterface(): void
+    {
+        // Arrange
+        $trigger = $this->createTriggerWithCommandPlugin(new stdClass());
+
+        // Assert
+        $this->expectException(LogicException::class);
+
+        // Act
+        $trigger->triggerEvent('event', [$this->createTriggerStateMachineItem()]);
+    }
+
+    public function testTriggerEventLogsTheCommandOfACommandByItemsPlugin(): void
+    {
+        // Arrange
+        $stateMachineItemTransfers = [$this->createTriggerStateMachineItem()];
+        $commandByItemsPluginMock = $this->getMockBuilder(CommandByItemsPluginInterface::class)->getMock();
+
+        $transitionLogMock = $this->createTransitionLogMock();
+        $transitionLogMock->expects($this->once())
+            ->method('addCommandByItems')
+            ->with($stateMachineItemTransfers, $commandByItemsPluginMock);
+
+        $trigger = $this->createTriggerWithCommandPlugin($commandByItemsPluginMock, null, $transitionLogMock);
+
+        // Act
+        $trigger->triggerEvent('event', $stateMachineItemTransfers);
     }
 
     public function testTriggerConditionsWithoutEventShouldExecuteConditionCheckAndTriggerEvents(): void
