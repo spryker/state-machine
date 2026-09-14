@@ -74,10 +74,10 @@ class GraphController extends AbstractController
         }
 
         $format = (string)$request->query->get(static::URL_PARAM_FORMAT) ?: null;
-        $fontSize = $request->query->getInt(static::URL_PARAM_FONT_SIZE);
+        $fontSize = (int)$request->query->get(static::URL_PARAM_FONT_SIZE, 0);
         $highlightState = $this->getSanitizedHighlightState($request);
         $stateMachine = (string)$request->query->get(static::URL_PARAM_STATE_MACHINE);
-        $version = $request->query->has(static::URL_PARAM_VERSION) ? $request->query->getInt(static::URL_PARAM_VERSION) : null;
+        $version = (int)$request->query->get(static::URL_PARAM_VERSION, 0) ?: null;
 
         $reload = false;
         $stateMachineBundleConfig = $this->getFactory()->getConfig();
@@ -146,7 +146,7 @@ class GraphController extends AbstractController
         $stateMachineBundleConfig = $this->getFactory()->getConfig();
         /** @var string $format */
         $format = $request->query->get(static::URL_PARAM_FORMAT, $stateMachineBundleConfig->getGraphDefaultFormat());
-        $fontSize = $request->query->getInt(static::URL_PARAM_FONT_SIZE, $stateMachineBundleConfig->getGraphDefaultFontSize());
+        $fontSize = (int)$request->query->get(static::URL_PARAM_FONT_SIZE, $stateMachineBundleConfig->getGraphDefaultFontSize()) ?: $stateMachineBundleConfig->getGraphDefaultFontSize();
 
         $stateMachineProcessTransfer = new StateMachineProcessTransfer();
         $stateMachineProcessTransfer->setStateMachineName($stateMachine);
