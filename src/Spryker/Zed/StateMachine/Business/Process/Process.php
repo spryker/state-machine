@@ -9,6 +9,9 @@ namespace Spryker\Zed\StateMachine\Business\Process;
 
 use Spryker\Zed\StateMachine\Business\Exception\StateMachineException;
 
+/**
+ * @SuppressWarnings(PHPMD.BooleanGetMethodName)
+ */
 class Process implements ProcessInterface
 {
     /**

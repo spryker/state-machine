@@ -14,3 +14,4 @@ parameters:
             identifier: offsetAssign.dimType
         -
             identifier: assign.propertyType
+        - '#PHPDoc tag @SuppressWarnings has invalid value#'

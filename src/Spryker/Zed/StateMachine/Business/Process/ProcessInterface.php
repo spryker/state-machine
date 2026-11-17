@@ -7,6 +7,9 @@
 
 namespace Spryker\Zed\StateMachine\Business\Process;
 
+/**
+ * @SuppressWarnings(PHPMD.BooleanGetMethodName)
+ */
 interface ProcessInterface
 {
     /**

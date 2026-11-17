@@ -344,8 +344,8 @@ class Builder implements BuilderInterface
 
         $event = clone $this->event;
         $event->setCommand($this->getAttributeString($xmlEvent, static::EVENT_COMMAND_ATTRIBUTE));
-        $event->setManual($this->getAttributeBoolean($xmlEvent, static::EVENT_MANUAL_ATTRIBUTE));
-        $event->setOnEnter($this->getAttributeBoolean($xmlEvent, static::EVENT_ON_ENTER_ATTRIBUTE));
+        $event->setManual($this->isAttributeTrue($xmlEvent, static::EVENT_MANUAL_ATTRIBUTE));
+        $event->setOnEnter($this->isAttributeTrue($xmlEvent, static::EVENT_ON_ENTER_ATTRIBUTE));
         $event->setTimeout($this->getAttributeString($xmlEvent, static::EVENT_TIMEOUT_ATTRIBUTE));
         $event->setName($eventName);
 
@@ -369,7 +369,7 @@ class Builder implements BuilderInterface
             $processName = $this->getAttributeString($xmlProcess, static::STATE_NAME_ATTRIBUTE);
             $process->setName($processName);
             $processMap[$processName] = $process;
-            $process->setIsMain($this->getAttributeBoolean($xmlProcess, static::PROCESS_MAIN_FLAG_ATTRIBUTE));
+            $process->setIsMain($this->isAttributeTrue($xmlProcess, static::PROCESS_MAIN_FLAG_ATTRIBUTE));
             $process->setFile($this->getAttributeString($xmlProcess, static::PROCESS_FILE_ATTRIBUTE));
 
             if ($process->getIsMain()) {
@@ -517,7 +517,7 @@ class Builder implements BuilderInterface
         );
 
         $transition->setHappyCase(
-            $this->getAttributeBoolean(
+            $this->isAttributeTrue(
                 $xmlTransition,
                 static::TRANSITION_HAPPY_PATH_ATTRIBUTE,
             ),
@@ -624,7 +624,7 @@ class Builder implements BuilderInterface
      *
      * @return bool
      */
-    protected function getAttributeBoolean(SimpleXMLElement $xmlElement, $attributeName)
+    protected function isAttributeTrue(SimpleXMLElement $xmlElement, $attributeName)
     {
         return (string)$xmlElement->attributes()[$attributeName] === 'true';
     }

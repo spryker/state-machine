@@ -15,6 +15,9 @@ use Spryker\Zed\StateMachine\Business\Process\StateInterface;
 use Spryker\Zed\StateMachine\Business\Process\TransitionInterface;
 use Spryker\Zed\StateMachine\Dependency\Plugin\StateMachineHandlerInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.ShortVariable)
+ */
 class Drawer implements DrawerInterface
 {
     /**

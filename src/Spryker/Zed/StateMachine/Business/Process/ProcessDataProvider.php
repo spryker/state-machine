@@ -29,8 +29,8 @@ class ProcessDataProvider implements ProcessDataProviderInterface
 
         $stateMachineHandler = $this->handlerResolver->get((string)$processCriteriaTransfer->getStateMachineName());
         $processFilePath = $this->pathResolver->getPathToProcessXmlFile($stateMachineProcessTransfer);
-        $commands = array_map(fn ($v) => '', array_flip(array_keys($stateMachineHandler->getCommandPlugins())));
-        $conditions = array_map(fn ($v) => '', array_flip(array_keys($stateMachineHandler->getConditionPlugins())));
+        $commands = array_map(fn ($value) => '', array_flip(array_keys($stateMachineHandler->getCommandPlugins())));
+        $conditions = array_map(fn ($value) => '', array_flip(array_keys($stateMachineHandler->getConditionPlugins())));
 
         return (new ProcessDataTransfer())
             ->setProcessFilePath($processFilePath)
